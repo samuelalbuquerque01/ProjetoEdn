@@ -11,7 +11,7 @@ Este projeto é uma aplicação web para controle e visualização de inventári
 https://samuelalbuquerque01.github.io/ProjetoEdn/
 ## 📁 Estrutura do Projeto
 
-´´´
+```
 project/
 ├── index.html # Página principal da aplicação
 ├── css/
@@ -25,7 +25,7 @@ project/
 │ ├── charts.js # Geração de gráficos usando Chart.js
 │ ├── inventory.js # Cadastro, edição, exclusão, filtro e exportação de itens
 │ └── ui.js # Manipulação de interface: navegação, tema, toast etc.
-´´´
+```
 
 ## 🚀 Funcionalidades
 
@@ -50,6 +50,47 @@ project/
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
+git clone https://github.com/samuelalbuquerque01/ProjetoEdn
 
+Credenciais de Teste
+Admin:
 
+Usuário: admin
+
+Senha: Admin@123
+
+Usuário Comum:
+
+Usuário: user
+
+Senha: User@123
+
+🌟 Contribuições
+Contribuições são sempre bem-vindas! Siga esses passos:
+
+Faça um Fork do projeto
+
+Crie sua Branch (git checkout -b feature/nova-feature)
+
+Commit suas mudanças (git commit -m 'Adiciona nova feature')
+
+Push para a Branch (git push origin feature/nova-feature)
+
+Abra um Pull Request
+
+📌 Observações
+Este projeto é totalmente front-end, ideal para:
+
+Testes e demonstrações
+
+Uso offline
+
+Base para integração com back-end
+
+Pode ser facilmente adaptado para uso com:
+
+Node.js
+
+Firebase
+
+Outras tecnologias back-end
