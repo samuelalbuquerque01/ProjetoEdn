@@ -1,0 +1,46 @@
+@media (max-width: 768px) {
+  .container { flex-direction: column; }
+
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+
+  .menu {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .menu button {
+    margin: 5px;
+    padding: 8px 12px;
+    flex: 1 0 auto;
+  }
+
+  .theme-toggle {
+    margin: 10px auto;
+    padding: 8px 12px;
+  }
+
+  .main-content { padding: 20px; }
+
+  table { font-size: 14px; }
+  th, td { padding: 8px 10px; }
+}
+
+@media (max-width: 480px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
