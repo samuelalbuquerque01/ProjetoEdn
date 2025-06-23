@@ -1,0 +1,55 @@
+# 📦 Projeto de Gerenciamento de Inventário
+
+![GitHub last commit](https://img.shields.io/github/last-commit/seu-usuario/seu-repositorio)
+![GitHub repo size](https://img.shields.io/github/repo-size/seu-usuario/seu-repositorio)
+
+
+Este projeto é uma aplicação web para controle e visualização de inventário de hardware, software e suprimentos. Conta com login de usuário, dashboards e gráficos interativos.
+
+## 🖥️ Demonstração
+
+https://samuelalbuquerque01.github.io/ProjetoEdn/
+## 📁 Estrutura do Projeto
+
+'''
+project/
+├── index.html # Página principal da aplicação
+├── css/
+│ ├── base.css # Estilos globais e layout base
+│ ├── components.css # Estilos de componentes (formulários, tabelas, toast etc.)
+│ ├── dashboard.css # Estilos específicos para dashboards
+│ ├── responsive.css # Estilos para responsividade
+│ └── variables.css # Variáveis CSS para temas e cores
+├── script/
+│ ├── auth.js # Lógica de login e controle de acesso
+│ ├── charts.js # Geração de gráficos usando Chart.js
+│ ├── inventory.js # Cadastro, edição, exclusão, filtro e exportação de itens
+│ └── ui.js # Manipulação de interface: navegação, tema, toast etc.
+'''
+
+## 🚀 Funcionalidades
+
+- ✅ Sistema de login com controle de acesso por perfil (`admin` e `user`)
+- 📋 Cadastro e gerenciamento de itens de inventário
+- 🔍 Filtro avançado de registros
+- 📤 Exportação de dados (CSV, JSON)
+- ✏️ Edição e exclusão de registros
+- 🌙 Tema escuro/claro com alternância dinâmica
+- 📊 Geração de gráficos com Chart.js
+- 📱 Layout totalmente responsivo
+- 🎉 Notificações toast para feedback do usuário
+
+## 🛠️ Tecnologias Utilizadas
+
+- ![HTML5](https://img.shields.io/badge/-HTML5-E34F26?logo=html5&logoColor=white)
+- ![CSS3](https://img.shields.io/badge/-CSS3-1572B6?logo=css3&logoColor=white)
+- ![JavaScript](https://img.shields.io/badge/-JavaScript-F7DF1E?logo=javascript&logoColor=black)
+- ![Chart.js](https://img.shields.io/badge/-Chart.js-FF6384?logo=chart.js&logoColor=white)
+
+## ⚙️ Como Executar
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/seu-usuario/seu-repositorio.git
+
+
