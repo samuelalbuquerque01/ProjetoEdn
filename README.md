@@ -11,7 +11,7 @@ Este projeto é uma aplicação web para controle e visualização de inventári
 https://samuelalbuquerque01.github.io/ProjetoEdn/
 ## 📁 Estrutura do Projeto
 
-'''
+´´´
 project/
 ├── index.html # Página principal da aplicação
 ├── css/
@@ -25,7 +25,7 @@ project/
 │ ├── charts.js # Geração de gráficos usando Chart.js
 │ ├── inventory.js # Cadastro, edição, exclusão, filtro e exportação de itens
 │ └── ui.js # Manipulação de interface: navegação, tema, toast etc.
-'''
+´´´
 
 ## 🚀 Funcionalidades
 
