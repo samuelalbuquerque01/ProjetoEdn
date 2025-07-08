@@ -68,5 +68,13 @@ document.addEventListener('DOMContentLoaded', () => {
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 });
+
+function limparForm(formId) {
+    const form = document.getElementById(formId);
+    if (confirm('Deseja realmente apagar todos os dados do formulário?')) {
+        form.reset();
+        showToast('Formulário limpo', 'info');
+    }
+}
    
    

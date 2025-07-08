@@ -1,168 +1,148 @@
-let inventories = JSON.parse(localStorage.getItem('inventories')) || [];
-let currentSort = { key: null, direction: 'asc' };
+// 1. Variável global para relacionamentos
+const relacionamentos = {
+    usuarios: JSON.parse(localStorage.getItem('usuarios')) || [],
+    maquinas: JSON.parse(localStorage.getItem('maquinas')) || [],
+    pips: JSON.parse(localStorage.getItem('pip')) || [],
+    softwares: JSON.parse(localStorage.getItem('software')) || [],
+    departamentos: JSON.parse(localStorage.getItem('departamentos')) || []
+};
 
-document.addEventListener('DOMContentLoaded', () => {
-  const darkMode = localStorage.getItem('darkMode') === 'true';
-  if (darkMode) {
-    document.body.classList.add('dark-mode');
-    document.querySelector('.theme-toggle').innerHTML = '<i class="fas fa-sun"></i> TEMA CLARO';
-  }
-
-  document.getElementById('inventory-form').addEventListener('submit', handleSubmit);
-  document.getElementById('search').addEventListener('input', filterItems);
-
-  document.querySelectorAll('th').forEach(header => {
-    if (header.textContent.includes('Usuário')) header.addEventListener('click', () => sortTable('usuario'));
-    if (header.textContent.includes('Hardware')) header.addEventListener('click', () => sortTable('hardware'));
-    if (header.textContent.includes('Setor')) header.addEventListener('click', () => sortTable('setor'));
-    if (header.textContent.includes('Data')) header.addEventListener('click', () => sortTable('dataAquisicao'));
-  });
-
-  updateStats();
-  renderTable();
-});
-
-function handleSubmit(event) {
-  event.preventDefault();
-  const form = event.target;
-  const formData = new FormData(form);
-  const newItem = Object.fromEntries(formData.entries());
-  newItem.id = Date.now();
-  newItem.dateCreated = new Date().toISOString();
-  inventories.push(newItem);
-  saveToLocalStorage();
-  form.reset();
-  updateStats();
-  renderTable();
-  showPage('list');
-  showToast('Item cadastrado com sucesso!', 'success');
+// 2. Função de filtro 
+function filterInventory() {
+    const term = document.getElementById('inventory-search').value.toLowerCase();
+    const rows = document.querySelectorAll('#inventory-body tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(term) ? '' : 'none';
+    });
 }
 
-function updateStats() {
-  document.getElementById('total-items').textContent = inventories.length;
-  document.getElementById('last-item').textContent = inventories.length > 0
-    ? new Date(inventories[inventories.length - 1].dateCreated).toLocaleDateString()
-    : 'N/A';
+// 3. Função para mostrar detalhes 
+window.mostrarDetalhesUsuario = function(usuarioId) {
+    const usuario = relacionamentos.usuarios.find(u => u.id === usuarioId);
+    if (!usuario) return;
 
-  const hardwareTypes = new Set(inventories.map(item => item.hardware));
-  document.getElementById('hardware-types').textContent = hardwareTypes.size;
-}
+    document.getElementById('detalhes-nome-usuario').textContent = usuario.nome;
+    document.getElementById('detalhes-departamento').textContent = 
+        relacionamentos.departamentos.find(d => d.id === usuario.departamentoId)?.nome || 'N/A';
 
-function renderTable(items = inventories) {
-  const tbody = document.getElementById('table-body');
-  tbody.innerHTML = '';
-
-  if (items.length === 0) {
-    document.getElementById('no-items').style.display = 'block';
-    document.getElementById('inventory-table').style.display = 'none';
-    return;
-  }
-
-  document.getElementById('no-items').style.display = 'none';
-  document.getElementById('inventory-table').style.display = 'table';
-
-  items.forEach((item, index) => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${item.usuario}</td>
-      <td>${item.hardware}</td>
-      <td>${item.setor}</td>
-      <td>${item.dataAquisicao}</td>
-      <td class="actions">
-        <button onclick="editItem(${index})"><i class="fas fa-edit"></i></button>
-        <button onclick="deleteItem(${index})"><i class="fas fa-trash"></i></button>
-        <button onclick="viewDetails(${index})"><i class="fas fa-eye"></i></button>
-      </td>`;
-    tbody.appendChild(row);
-  });
-}
-
-function editItem(index) {
-  const item = inventories[index];
-  const form = document.getElementById('inventory-form');
-  Object.keys(item).forEach(k => form.elements[k] && (form.elements[k].value = item[k]));
-
-  form.onsubmit = function (e) {
-    e.preventDefault();
-    const formData = new FormData(form);
-    const updated = Object.fromEntries(formData.entries());
-    updated.id = item.id;
-    updated.dateCreated = item.dateCreated;
-    inventories[index] = updated;
-    saveToLocalStorage();
-    form.reset();
-    form.onsubmit = handleSubmit;
-    updateStats();
-    renderTable();
-    showPage('list');
-    showToast('Item atualizado com sucesso!', 'success');
-  };
-  showPage('form');
-}
-
-function deleteItem(index) {
-  if (confirm('Deseja excluir este item?')) {
-    inventories.splice(index, 1);
-    saveToLocalStorage();
-    renderTable();
-    updateStats();
-    showToast('Item removido com sucesso!', 'success');
-  }
-}
-
-function viewDetails(index) {
-  const item = inventories[index];
-  let details = '';
-  for (const [key, value] of Object.entries(item)) {
-    if (key !== 'id' && key !== 'dateCreated') {
-      details += `${key}: ${value}\n`;
+    const maquinaVinculada = relacionamentos.maquinas.find(m => m.usuarioId === usuarioId);
+    if (maquinaVinculada) {
+        document.getElementById('maquina-modelo').textContent = maquinaVinculada.placa_mae;
+        document.getElementById('maquina-cpu').textContent = maquinaVinculada.processador;
+        document.getElementById('maquina-ram').textContent = maquinaVinculada.memoria;
     }
-  }
-  alert(`Detalhes:\n\n${details}`);
+
+    const pipVinculado = relacionamentos.pips.find(p => p.usuarioId === usuarioId);
+    if (pipVinculado) {
+        document.getElementById('pip-codigo').textContent = pipVinculado.codigo;
+        document.getElementById('pip-data').textContent = 
+            new Date(pipVinculado.dataCadastro).toLocaleDateString('pt-BR');
+    }
+
+    const softwareList = document.getElementById('detalhes-software');
+    softwareList.innerHTML = '';
+    relacionamentos.softwares
+        .filter(s => s.usuarioId === usuarioId)
+        .forEach(soft => {
+            const li = document.createElement('li');
+            li.textContent = `${soft.nome} (${soft.serial})`;
+            softwareList.appendChild(li);
+        });
+
+    document.getElementById('detalhes-usuario').style.display = 'block';
+};
+
+// 4. Função para fechar detalhes
+window.fecharDetalhes = function() {
+    document.getElementById('detalhes-usuario').style.display = 'none';
+};
+
+// 5. Simulação de dados
+function simularDadosTeste() {
+    if (!window.location.href.includes("index.html")) return;
+
+    if (!localStorage.getItem('usuarios')) {
+        console.warn("⚠️ Criando dados de teste...");
+        
+        const mockData = {
+            usuarios: [
+                { id: 1, nome: "João Silva (TESTE)", departamentoId: 1, dataCadastro: new Date() }
+            ],
+            departamentos: [
+                { id: 1, nome: "TI-MOCK" }
+            ],
+            maquinas: [
+                { 
+                    id: 101, 
+                    placa_mae: "MOCK-DELL", 
+                    processador: "i7-MOCK", 
+                    memoria: "16GB",
+                    usuarioId: 1
+                }
+            ],
+            pip: [
+                { id: 201, codigo: "PIP-TESTE", usuarioId: 1, dataCadastro: new Date() }
+            ],
+            software: [
+                { id: 301, nome: "Windows", serial: "123-456", usuarioId: 1 }
+            ]
+        };
+
+        Object.entries(mockData).forEach(([key, value]) => {
+            localStorage.setItem(key, JSON.stringify(value));
+        });
+    }
 }
 
-function filterItems() {
-  const term = document.getElementById('search').value.toLowerCase();
-  const filtered = inventories.filter(item =>
-    Object.values(item).some(val => String(val).toLowerCase().includes(term))
-  );
-  renderTable(filtered);
+// 6. Carregar inventário
+function loadFullInventory() {
+    const tbody = document.getElementById('inventory-body');
+    if (!tbody) {
+        console.error("Elemento 'inventory-body' não encontrado!");
+        return;
+    }
+    
+    tbody.innerHTML = '';
+
+    // Adiciona usuários
+    relacionamentos.usuarios.forEach(usuario => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><span class="badge usuário">USUÁRIO</span></td>
+            <td>${usuario.nome}</td>
+            <td>Depto: ${relacionamentos.departamentos.find(d => d.id === usuario.departamentoId)?.nome || 'N/A'}</td>
+            <td>${new Date(usuario.dataCadastro).toLocaleDateString('pt-BR')}</td>
+            <td class="actions">
+                <button onclick="mostrarDetalhesUsuario(${usuario.id})">
+                    <i class="fas fa-search"></i> Detalhes
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    // Adicionar outras categorias aqui caso seja nescessario
 }
 
-function sortTable(key) {
-  document.querySelectorAll('th i').forEach(i => i.className = 'fas fa-sort');
-  const header = [...document.querySelectorAll('th')].find(th => th.textContent.includes(
-    key === 'usuario' ? 'Usuário' : key === 'hardware' ? 'Hardware' : key === 'setor' ? 'Setor' : 'Data'
-  ));
-  header.querySelector('i').className = currentSort.direction === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
-  currentSort.direction = currentSort.key === key && currentSort.direction === 'asc' ? 'desc' : 'asc';
-  currentSort.key = key;
+// 7. Inicialização
+function initInventory() {
+    try {
+        if (!document.getElementById('list-page')) return;
 
-  inventories.sort((a, b) => {
-    const valA = a[key] || '';
-    const valB = b[key] || '';
-    return currentSort.direction === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-  });
+        simularDadosTeste();
+        loadFullInventory();
 
-  renderTable();
+        const searchInput = document.getElementById('inventory-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', filterInventory);
+        }
+
+    } catch (error) {
+        console.error("Erro ao inicializar inventário:", error);
+    }
 }
 
-function exportToCSV() {
-  if (inventories.length === 0) return showToast('Nenhum dado para exportar!', 'error');
-  let csv = 'Usuário,Hardware,Software,Suprimento,Setor,Data de Aquisição\n';
-  inventories.forEach(i => {
-    csv += `"${i.usuario}","${i.hardware}","${i.software}","${i.suprimento}","${i.setor}","${i.dataAquisicao}"\n`;
-  });
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.setAttribute('download', `inventario_${new Date().toLocaleDateString()}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  showToast('Exportação concluída!', 'success');
-}
-
-function saveToLocalStorage() {
-  localStorage.setItem('inventories', JSON.stringify(inventories));
-}
+// 8. Iniciar quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', initInventory);
