@@ -1,18 +1,43 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('software-form');
-    
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('software-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const nomeSoftware = document.getElementById('nomeSoftware').value.trim();
+    const nomeSerial = document.getElementById('nomeSerial').value.trim();
+
+
+    if (!nomeSoftware) {
+        showMessage('Por favor, digite um nome para o software', 'error');
+        return;
+    }
+
+    if (!nomeSerial) {
+    showMessage('Por favor, digite um nome para o serial', 'error');
+    return;
+}
         try {
-            console.log('Dados para enviar ao backend:', data);
+        const response = await fetch('http://localhost:8080/software', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nome: nomeSoftware,
+                serial: nomeSerial
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
             showToast('Software salvo com sucesso!', 'success');
-            form.reset();
-        } catch (err) {
-            console.error(err);
-            showToast('Erro ao salvar software', 'error');
+            document.getElementById('software-form').reset();
+        } else {
+            const errorData = await response.json();
+            showToast(`Erro ao cadastrar: ${errorData.message || 'Erro desconhecido'}`, 'error');
         }
+    } catch (error) {
+        console.error('Erro:', error);
+        showToast('Erro na conexão com o servidor', 'error');
+    }
     });
 });
