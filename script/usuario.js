@@ -1,22 +1,68 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('usuario-form');
-    
-    // Carrega departamentos ao carregar a página
-    atualizarDepartamentos();
-    
-    form.addEventListener('submit', async (e) => {
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadDepartamentos();
+
+    document.getElementById('usuario-form').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        
+
+        const usuarioName = document.getElementById('nomeUsuario').value.trim();
+        const departamentoId = document.getElementById('nomeDepartamento').value;
+
+        if (!usuarioName) {
+            showToast('Por favor, digite um nome para o usuário', 'error');
+            return;
+        }
+
+        if (!departamentoId) {
+            showToast('Por favor, selecione um departamento', 'error');
+            return;
+        }
+
         try {
-            //chamada para o backend
-            console.log('Dados para enviar ao backend:', data);
-            showToast('Usuário salvo com sucesso!', 'success');
-            form.reset();
-        } catch (err) {
-            console.error(err);
-            showToast('Erro ao salvar usuário', 'error');
+            const response = await fetch('http://localhost:8080/usuario', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nome: usuarioName,
+                    idDepartamento: departamentoId
+                })
+            });
+
+            if (response.ok) {
+                console.log('a response é: ' + response)
+                const data = await response.json();
+                showToast('Usuário salvo com sucesso!', 'success');
+                document.getElementById('usuario-form').reset();
+            } else {
+                const errorData = await response.json();
+                showToast(`Erro ao cadastrar: ${errorData.message || 'Erro desconhecido'}`, 'error');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            showToast('Erro na conexão com o servidor', 'error');
         }
     });
 });
+
+async function loadDepartamentos() {
+    try {
+        const response = await fetch('http://localhost:8080/departamento');
+        if (response.ok) {
+            const departamentos = await response.json();
+            console.log('API Response:', departamentos); // Debug API response
+            const select = document.getElementById('nomeDepartamento');
+            departamentos.forEach(departamento => {
+                const option = document.createElement('option');
+                option.value = departamento.idDepartamento;
+                option.textContent = departamento.nomeDepartamento;
+                select.append(option);  
+            });
+        } else {
+            console.error('Erro ao carregar departamentos');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+    }
+}
+

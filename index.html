@@ -81,7 +81,7 @@
                 <form id="departamento-form">
                     <div class="form-group">
                         <label>Nome do Departamento</label>
-                        <input type="text" name="nome" placeholder="Ex: TI, RH, Financeiro" required>
+                        <input type="text" id="departamento" name="nome" placeholder="Ex: TI, RH, Financeiro" required>
                     </div>
                     <div class="form-actions">
                         <button type="submit"><i class="fas fa-save"></i> Salvar</button>
@@ -96,11 +96,11 @@
                 <form id="usuario-form">
                     <div class="form-group">
                         <label>Nome</label>
-                        <input type="text" name="nome" required>
+                        <input type="text" id="nomeUsuario" name="nome" required>
                     </div>
                     <div class="form-group">
                         <label>Departamento</label>
-                        <select name="departamento" required>
+                        <select name="departamento" id="nomeDepartamento" required>
                             <option value="">Selecione...</option>
                             <!-- Opções serão preenchidas via JavaScript -->
                         </select>
@@ -261,7 +261,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script/ui.js"></script>
     <script src="script/auth.js"></script>
-    <script src="script/departamento.js"></script>
+    <script src="script/departamento.js" defer></script>
     <script src="script/usuario.js"></script>
     <script src="script/software.js"></script>
     <script src="script/pip.js"></script>
