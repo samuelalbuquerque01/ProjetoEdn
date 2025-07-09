@@ -1,46 +1,48 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('departamento-form');
-    
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('departamento-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const departmentName = document.getElementById('departamento').value.trim();
+
+    if (!departmentName) {
+        showMessage('Por favor, digite um nome para o departamento', 'error');
+        return;
+    }
+
         try {
-            //chamada para o backend
-            // Simulando uma resposta do servidor
-            console.log('Dados para enviar ao backend:', data);
+        const response = await fetch('http://localhost:8080/departamento', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nome: departmentName
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
             showToast('Departamento salvo com sucesso!', 'success');
-            form.reset();
-            
-            // Atualiza a lista de departamentos para o formulário de usuário
-            atualizarDepartamentos();
-        } catch (err) {
-            console.error(err);
-            showToast('Erro ao salvar departamento', 'error');
+            document.getElementById('departamento-form').reset();
+        } else {
+            const errorData = await response.json();
+            showToast(`Erro ao cadastrar: ${errorData.message || 'Erro desconhecido'}`, 'error');
         }
+    } catch (error) {
+        console.error('Erro:', error);
+        showToast('Erro na conexão com o servidor', 'error');
+    }
     });
 });
 
-function limparForm(formId) {
-    const form = document.getElementById(formId);
-    if (confirm('Deseja realmente apagar todos os dados do formulário?')) {
-        form.reset();
-        showToast('Formulário limpo', 'info');
-    }
+function showMessage(message, type) {
+const responseElement = document.getElementById('responseMessage');
+responseElement.textContent = message;
+responseElement.className = `response-message ${type}`;
+responseElement.style.display = 'block';
+
+    setTimeout(() => {
+        responseElement.style.display = 'none';
+    }, 5000);
 }
 
-// Função para atualizar a lista de departamentos no formulário de usuário
-function atualizarDepartamentos() {
-    // Simulando busca de departamentos
-    const departamentos = ['TI', 'RH', 'Financeiro', 'Administrativo'];
-    const select = document.querySelector('#usuario-form select[name="departamento"]');
-    
-    select.innerHTML = '<option value="">Selecione...</option>';
-    departamentos.forEach(depto => {
-        const option = document.createElement('option');
-        option.value = depto;
-        option.textContent = depto;
-        select.appendChild(option);
-    });
-}
