@@ -183,49 +183,92 @@
     </section>
 
             <section id="maquina-page" class="page">
-                <h2>Cadastro de Máquina</h2>
-                <form id="maquina-form">
-                    <div class="form-group">
-                        <label>Placa Mãe</label>
-                        <input type="text" id="placa-mae" name="placa_mae" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Marca Processador</label>
-                        <input type="text" id="marca-processador" name="marca_processador" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Processador</label>
-                        <input type="text" id="processador" name="processador" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Modelo Memória</label>
-                        <input type="text" id="modelo-memoria" name="modelo_memoria" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Frequência Memória</label>
-                        <input type="text" id="frequencia-memoria" name="frequencia_memoria" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Quantidade de Memória</label>
-                        <input type="number" id="quantidade-memoria" name="quantidade_memoria" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Tipo de Armazenamento</label>
-                        <input type="text" id="tipo-armazenamento" name="tipo-armazenamento" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Quantidade de Armazenamento</label>
-                        <input type="number" id="quantidade-armazenamento" name="quantidade_armazenamento" required>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit"><i class="fas fa-save"></i> Salvar</button>
-                        <button type="button" onclick="limparForm('maquina-form')"><i class="fas fa-trash"></i> Apagar</button>
-                        <button type="button" onclick="showPage('home')">Cancelar</button>
-                    </div>
-                </form>
-
-                
-            </section>
+    <h2>CADASTRO DE MÁQUINA</h2>
+    <form id="maquina-form">
+        <div class="form-group">
+            <label>PLACA MÃE</label>
+            <input type="text" id="placa-mae" name="placa_mae" required>
+        </div>
+        
+        <div class="form-group">
+            <label>MARCA PROCESSADOR</label>
+            <select id="marca-processador" name="marca_processador" required>
+                <option value="">SELECIONE...</option>
+                <option value="AMD">AMD</option>
+                <option value="INTEL">INTEL</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>PROCESSADOR</label>
+            <input type="text" id="processador" name="processador" required>
+        </div>
+        
+        <div class="form-group">
+            <label>MODELO MEMÓRIA</label>
+            <select id="modelo-memoria" name="modelo_memoria" required>
+                <option value="">SELECIONE...</option>
+                <option value="DDR1">DDR1</option>
+                <option value="DDR2">DDR2</option>
+                <option value="DDR3">DDR3</option>
+                <option value="DDR4">DDR4</option>
+                <option value="DDR5">DDR5</option>
+            </select>
+        </div>
+       <div class="form-group">
+    <label>FREQUÊNCIA MEMÓRIA</label>
+    <select id="frequencia-memoria" name="frequencia_memoria" required>
+        <option value="">SELECIONE...</option>
+        <option value="200 MHz">200 MHz</option>
+        <option value="266 MHz">266 MHz</option>
+        <option value="333 MHz">333 MHz</option>
+        <option value="400 MHz">400 MHz</option>
+        <option value="533 MHz">533 MHz</option>
+        <option value="667 MHz">667 MHz</option>
+        <option value="800 MHz">800 MHz</option>
+        <option value="1066 MHz">1066 MHz</option>
+        <option value="1333 MHz">1333 MHz</option>
+        <option value="1600 MHz">1600 MHz</option>
+        <option value="1866 MHz">1866 MHz</option>
+        <option value="2133 MHz">2133 MHz</option>
+        <option value="2400 MHz">2400 MHz</option>
+        <option value="2666 MHz">2666 MHz</option>
+        <option value="2933 MHz">2933 MHz</option>
+        <option value="3200 MHz">3200 MHz</option>
+        <option value="4800 MHz">4800 MHz</option>
+        <option value="5200 MHz">5200 MHz</option>
+        <option value="6000 MHz">6000 MHz</option>
+        <option value="6400 MHz">6400 MHz</option>
+    </select>
+</div>
+        
+        <div class="form-group">
+            <label>QUANTIDADE DE MEMÓRIA (GB)</label>
+            <input type="number" id="quantidade-memoria" name="quantidade_memoria" required>
+        </div>
+        
+        <div class="form-group">
+            <label>TIPO DE ARMAZENAMENTO</label>
+            <select id="tipo-armazenamento" name="tipo_armazenamento" required>
+                <option value="">SELECIONE...</option>
+                <option value="SSD">SSD</option>
+                <option value="HDD">HDD</option>
+                <option value="NVME">NVME</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>QUANTIDADE DE ARMAZENAMENTO (GB)</label>
+            <input type="number" id="quantidade-armazenamento" name="quantidade_armazenamento" required>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit"><i class="fas fa-save"></i> SALVAR</button>
+            <button type="button" onclick="limparForm('maquina-form')"><i class="fas fa-trash"></i> APAGAR</button>
+            <button type="button" onclick="showPage('home')"><i class="fas fa-times"></i> CANCELAR</button>
+        </div>
+    </form>
+</section>
 
        <!-- Página de Inventário  -->
             <section id="list-page" class="page">
