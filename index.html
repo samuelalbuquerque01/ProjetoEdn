@@ -98,32 +98,65 @@
 
             <!-- Página de Relacionamentos -->
             <section id="relacionamento-page" class="page">
-                <div class="relacionamento-container">
-                    <div class="relacionamento-header">
-                        <h2 class="relacionamento-title">
-                            <i class="fas fa-project-diagram"></i> Relacionamentos
-                        </h2>
-                        <div class="relacionamento-actions">
-                            <button id="btn-editar-relacionamento" class="btn-editar">
-                                <i class="fas fa-edit"></i> Editar
-                            </button>
-                            <button id="btn-salvar-relacionamento" class="btn-salvar" style="display: none;">
-                                <i class="fas fa-save"></i> Salvar
-                            </button>
-                        </div>
-                    </div>
+                <h2 class="relacionamento-title">
+                    <i class="fas fa-project-diagram"></i> Relacionamentos
+                </h2>
+                    <form id="relacionamento-form">
 
                     <div class="form-group">
-                        <label><i class="fas fa-user"></i> Selecione um Usuário</label>
-                        <select id="select-usuario" class="form-control" onchange="carregarRelacionamentos(this.value)">
+                        <label>Usuário</label>
+                        <select name="usuario" id="nomeUsuarioo" required>
                             <option value="">Selecione...</option>
+                            <!-- Opções serão preenchidas via JavaScript -->
+                        </select>
+                        <label>Departamento</label>
+                        <select name="departamento" id="nomeDepartamentos" required>
+                            <option value="">Selecione...</option>
+                            <!-- Opções serão preenchidas via JavaScript -->
+                        </select>
+                        <label>Máquina</label>
+                        <select name="maquina" id="nomeMaquina" required>
+                            <option value="">Selecione...</option>
+                            <!-- Opções serão preenchidas via JavaScript -->
+                        </select>
+                        <label>Marca do Processador</label>
+                        <input type="text" id="marcaProcessador" readonly>
+
+                        <label>Processador</label>
+                        <input type="text" id="processador" readonly>
+
+                        <label>Modelo da Memória</label>
+                        <input type="text" id="modeloMemoria" readonly>
+
+                        <label>Frequência da Memória</label>
+                        <input type="text" id="frequenciaMemoria" readonly>
+
+                        <label>Quantidade de Memória (GB)</label>
+                        <input type="text" id="quantidadeMemoria" readonly>
+
+                        <label>Tipo de Armazenamento</label>
+                        <input type="text" id="tipoArmazenamento" readonly>
+
+                        <label>Quantidade de Armazenamento (GB)</label>
+                        <input type="text" id="quantidadeArmazenamento" readonly>
+
+                        <label>PIP</label>
+                        <select name="pip" id="nomePip" required>
+                            <option value="">Selecione...</option>
+                            <!-- Opções serão preenchidas via JavaScript -->
+                        </select>
+                        <label>Software</label>
+                        <select name="software" id="nomeSoftware" required>
+                            <option value="">Selecione...</option>
+                            <!-- Opções serão preenchidas via JavaScript -->
                         </select>
                     </div>
-
-                    <div class="relacionamento-grid" id="info-relacionamento" style="display: none;">
-                        <!-- Cards serão gerados dinamicamente via JavaScript -->
+                    <div class="form-actions">
+                        <button type="submit"><i class="fas fa-save"></i> Salvar</button>
+                        <button type="button" onclick="limparForm('relacionamento-form')"><i class="fas fa-trash"></i> Apagar</button>
+                        <button type="button" onclick="showPage('home')">Cancelar</button>
                     </div>
-                </div>
+                </form>
             </section>
 
             <section id="usuario-page" class="page">
@@ -223,8 +256,6 @@
                         <button type="button" onclick="showPage('home')">Cancelar</button>
                     </div>
                 </form>
-
-                
             </section>
 
        <!-- Página de Inventário  -->
@@ -239,17 +270,17 @@
                         <button onclick="exportToCSV()" class="export-btn">
                             <i class="fas fa-file-export"></i> Exportar
                         </button>
-        </div>
+                </div>
     </div>
-
     <!-- Tabela -->
             <table id="full-inventory-table">
                 <thead>
                         <tr>
-                            <th>Tipo</th>
-                            <th>Nome/ID</th>
-                            <th>Detalhes</th>
-                            <th>Cadastrado em</th>
+                            <th>Nome</th>
+                            <th>Departamento</th>
+                            <th>Máquina</th>
+                            <th>Software</th>
+                            <th>PIP</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
