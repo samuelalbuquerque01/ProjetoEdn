@@ -182,37 +182,37 @@ async function loadSoftware() {
 }
 
 
-// document.getElementById('nomeMaquina').addEventListener('change', async function() {
-//     const maquinaId = this.value;
-//     if (maquinaId) {
-//         const maquina = await fetchMaquina(maquinaId);
-//         if (maquina) {
-//             document.getElementById('marcaProcessador').value = maquina.marcaProcessador;
-//             document.getElementById('processador').value = maquina.processador;
-//             document.getElementById('modeloMemoria').value = maquina.modeloMemoria;
-//             document.getElementById('frequenciaMemoria').value = maquina.frequenciaMemoria;
-//             document.getElementById('quantidadeMemoria').value = maquina.quantidadeMemoria;
-//             document.getElementById('tipoArmazenamento').value = maquina.tipoArmazenamento;
-//             document.getElementById('quantidadeArmazenamento').value = maquina.quantidadeArmazenamento;
+document.getElementById('nomeMaquina').addEventListener('change', async function() {
+    const maquinaId = this.value;
+    if (maquinaId) {
+        const maquina = await fetchMaquina(maquinaId);
+        if (maquina) {
+            document.getElementById('marcaProcessador').value = maquina.marcaProcessador;
+            document.getElementById('processador').value = maquina.processador;
+            document.getElementById('modeloMemoria').value = maquina.modeloMemoria;
+            document.getElementById('frequenciaMemoria').value = maquina.frequenciaMemoria;
+            document.getElementById('quantidadeMemoria').value = maquina.quantidadeMemoria;
+            document.getElementById('tipoArmazenamento').value = maquina.tipoArmazenamento;
+            document.getElementById('quantidadeArmazenamento').value = maquina.quantidadeArmazenamento;
 
-//             document.getElementById('subform-maquina').style.display = 'block';
-//         }
-//     } else {
-//         document.getElementById('subform-maquina').style.display = 'none';
-//     }
-// });
+            document.getElementById('subform-maquina').style.display = 'block';
+        }
+    } else {
+        document.getElementById('subform-maquina').style.display = 'none';
+    }
+});
 
-// async function fetchMaquina(maquinaId) {
-//     try {
-//         const response = await fetch(`http://localhost:8080/maquina/${maquinaId}`);
-//         if (response.ok) {
-//             return await response.json();
-//         } else {
-//             console.error('Erro ao carregar a máquina');
-//             return null;
-//         }
-//     } catch (error) {
-//         console.error('Erro:', error);
-//         return null;
-//     }
-// }
+async function fetchMaquina(maquinaId) {
+    try {
+        const response = await fetch(`http://localhost:8080/maquina/${maquinaId}`);
+        if (response.ok) {
+            return await response.json();
+        } else {
+            console.error('Erro ao carregar a máquina');
+            return null;
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        return null;
+    }
+}
