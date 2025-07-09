@@ -146,3 +146,77 @@ function initInventory() {
 
 // 8. Iniciar quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', initInventory);
+
+// Função para gerar o relatório completo
+function gerarRelatorioGeral() {
+    const dados = {
+        usuarios: JSON.parse(localStorage.getItem('usuarios')) || [],
+        departamentos: JSON.parse(localStorage.getItem('departamentos')) || [],
+        maquinas: JSON.parse(localStorage.getItem('maquinas')) || [],
+        softwares: JSON.parse(localStorage.getItem('software')) || [],
+        pips: JSON.parse(localStorage.getItem('pip')) || []
+    };
+
+    const tbody = document.getElementById('inventory-body');
+    tbody.innerHTML = '';
+
+    // Adiciona todos os itens ao inventário
+    Object.entries(dados).forEach(([tipo, itens]) => {
+        itens.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><span class="badge ${tipo}">${tipo.toUpperCase()}</span></td>
+                <td>${item.nome || item.placa_mae || 'Sem nome'}</td>
+                <td>${item.usuarioId ? `Vinculado ao usuário ${item.usuarioId}` : 'Sem vínculo'}</td>
+                <td>${new Date().toLocaleDateString('pt-BR')}</td>
+                <td class="actions">
+                    <button onclick="mostrarDetalhesItem('${tipo}', ${item.id})">
+                        <i class="fas fa-search"></i> Detalhes
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    });
+}
+
+// Chama a função quando a página carrega
+document.addEventListener('DOMContentLoaded', gerarRelatorioGeral);
+
+// Função para criar dados de teste 
+function criarDadosTeste() {
+    if (localStorage.getItem('dadosTesteCriados')) return;
+
+    console.log("Criando dados de teste...");
+    
+    const dadosTeste = {
+        usuarios: [
+            { id: 1, nome: "João Silva", departamentoId: 1 }
+        ],
+        departamentos: [
+            { id: 1, nome: "TI" }
+        ],
+        maquinas: [
+            { id: 1, placa_mae: "Dell XPS 15", processador: "i7-11800H", memoria: "16GB", usuarioId: 1 }
+        ],
+        software: [
+            { id: 1, nome: "Windows 10", serial: "WIN-123", usuarioId: 1 }
+        ],
+        pip: [
+            { id: 1, nome: "PIP-2023-001", usuarioId: 1 }
+        ]
+    };
+
+    Object.entries(dadosTeste).forEach(([key, value]) => {
+        localStorage.setItem(key, JSON.stringify(value));
+    });
+    
+    localStorage.setItem('dadosTesteCriados', 'true');
+    console.log("✅ Dados de teste criados com sucesso!");
+}
+
+// event listener 
+document.addEventListener('DOMContentLoaded', () => {
+    criarDadosTeste();
+    initInventory(); // Sua função existente
+});

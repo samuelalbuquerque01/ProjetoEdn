@@ -37,6 +37,9 @@
                 <button onclick="showPage('maquina')">
                     <i class="fas fa-laptop"></i> MÁQUINA
                 </button>
+                <button onclick="showPage('relacionamento')">
+                    <i class="fas fa-project-diagram"></i> RELACIONAMENTOS
+                </button>
                 <button onclick="showPage('list')">
                     <i class="fas fa-list"></i> INVENTÁRIO
                 </button>
@@ -73,7 +76,9 @@
                         <canvas id="sector-chart"></canvas>
                     </div>
                 </div>
+                
             </section>
+            
 
             <!-- Páginas de Formulários -->
             <section id="departamento-page" class="page">
@@ -89,6 +94,36 @@
                         <button type="button" onclick="showPage('home')">Cancelar</button>
                     </div>
                 </form>
+            </section>
+
+            <!-- Página de Relacionamentos -->
+            <section id="relacionamento-page" class="page">
+                <div class="relacionamento-container">
+                    <div class="relacionamento-header">
+                        <h2 class="relacionamento-title">
+                            <i class="fas fa-project-diagram"></i> Relacionamentos
+                        </h2>
+                        <div class="relacionamento-actions">
+                            <button id="btn-editar-relacionamento" class="btn-editar">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button id="btn-salvar-relacionamento" class="btn-salvar" style="display: none;">
+                                <i class="fas fa-save"></i> Salvar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Selecione um Usuário</label>
+                        <select id="select-usuario" class="form-control" onchange="carregarRelacionamentos(this.value)">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+
+                    <div class="relacionamento-grid" id="info-relacionamento" style="display: none;">
+                        <!-- Cards serão gerados dinamicamente via JavaScript -->
+                    </div>
+                </div>
             </section>
 
             <section id="usuario-page" class="page">
@@ -188,9 +223,11 @@
                         <button type="button" onclick="showPage('home')">Cancelar</button>
                     </div>
                 </form>
+
+                
             </section>
 
-       <!-- Página de Inventário (Relatório Consolidado) -->
+       <!-- Página de Inventário  -->
             <section id="list-page" class="page">
                 <div class="list-header">
                     <h2><i class="fas fa-boxes"></i> Inventário Completo</h2>
@@ -205,7 +242,7 @@
         </div>
     </div>
 
-    <!-- Tabela Consolidada -->
+    <!-- Tabela -->
             <table id="full-inventory-table">
                 <thead>
                         <tr>
@@ -218,7 +255,7 @@
                     </thead>
                     <tbody id="inventory-body"></tbody>
                 </table>
-    <!-- Adicione esta seção abaixo da tabela principal -->
+   
 <div id="detalhes-usuario" class="detalhes-container" style="display: none;">
     <h3>
         <i class="fas fa-user"></i> 
@@ -276,5 +313,6 @@
     <script src="script/maquina.js"></script>
     <script src="script/inventory.js"></script>
     <script src="script/charts.js"></script>
+<script src="script/relacionamento.js"></script>
 </body>
 </html>
