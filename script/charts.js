@@ -1,109 +1,39 @@
-document.addEventListener('DOMContentLoaded', async function() {
+let hardwareChart = null;
+let sectorChart = null;
 
-  await loadTotalItens();
-
-});
-
-async function loadTotalItens() {
-    try {
-        const response = await fetch('http://localhost:8080/relacionamento/itens');
-        if (response.ok) {
-            const totalItens = await response.json();
-            console.log('API Response:', totalItens);
-
-            const select = document.getElementById('total-items');
-            select.innerHTML = '';
-
-            const option = document.createElement('option');
-            option.value = totalItens;
-            option.textContent = totalItens;
-            select.appendChild(option);
-        } else {
-            console.error('Erro ao carregar total de itens');
-        }
-    } catch (error) {
-        console.error('Erro:', error);
-    }
-}
-
-let hardwareChart;
-let sectorChart;
-
-async function initCharts() {
+function initCharts() {
   const hardwareCanvas = document.getElementById('hardware-chart');
   const sectorCanvas = document.getElementById('sector-chart');
-
   if (!hardwareCanvas || !sectorCanvas || !document.getElementById('home-page').classList.contains('active')) return;
 
-  try {
-    const response = await fetch('http://localhost:8080/relacionamento');
-    const inventories = await response.json();
+  const hardwareCounts = {};
+  const sectorCounts = {};
 
-    const hardwareCounts = {};
-    const sectorCounts = {};
+  inventories.forEach(item => {
+    hardwareCounts[item.hardware] = (hardwareCounts[item.hardware] || 0) + 1;
+    sectorCounts[item.setor] = (sectorCounts[item.setor] || 0) + 1;
+  });
 
-    inventories.forEach(item => {
-      const hardware = item.maquina.placaMae || 'Não informado';
-      const setor = item.usuario.departamento.nomeDepartamento || 'Sem setor';
+  const backgroundColors = ['#4361ee', '#3f37c9', '#4895ef', '#4cc9f0', '#560bad', '#b5179e'];
 
-      hardwareCounts[hardware] = (hardwareCounts[hardware] || 0) + 1;
-      sectorCounts[setor] = (sectorCounts[setor] || 0) + 1;
-    });
+  if (hardwareChart) hardwareChart.destroy();
+  if (sectorChart) sectorChart.destroy();
 
-    const backgroundColors = [
-      '#4361ee', '#3f37c9', '#4895ef', '#4cc9f0',
-      '#560bad', '#b5179e', '#7209b7', '#f72585'
-    ];
+  hardwareChart = new Chart(hardwareCanvas, {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(hardwareCounts),
+      datasets: [{ data: Object.values(hardwareCounts), backgroundColor: backgroundColors }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'right' } } }
+  });
 
-    // Destroi gráficos antigos se existirem
-    if (hardwareChart) hardwareChart.destroy();
-    if (sectorChart) sectorChart.destroy();
-
-    // Gráfico de Hardware (Pizza)
-    hardwareChart = new Chart(hardwareCanvas, {
-      type: 'doughnut',
-      data: {
-        labels: Object.keys(hardwareCounts),
-        datasets: [{
-          data: Object.values(hardwareCounts),
-          backgroundColor: backgroundColors
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { position: 'right' }
-        }
-      }
-    });
-
-    // Gráfico de Setor (Barra)
-    sectorChart = new Chart(sectorCanvas, {
-      type: 'bar',
-      data: {
-        labels: Object.keys(sectorCounts),
-        datasets: [{
-          label: 'Itens por Setor',
-          data: Object.values(sectorCounts),
-          backgroundColor: backgroundColors
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: { beginAtZero: true }
-        }
-      }
-    });
-
-  } catch (error) {
-    console.error('Erro ao carregar dados dos gráficos:', error);
-  }
+  sectorChart = new Chart(sectorCanvas, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(sectorCounts),
+      datasets: [{ label: 'Itens por Setor', data: Object.values(sectorCounts), backgroundColor: backgroundColors }]
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+  });
 }
-
-// Chame a função ao carregar ou quando a aba "home-page" for ativada
-window.onload = () => {
-  fetchData();
-  initCharts();
-};
-

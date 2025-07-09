@@ -1,218 +1,221 @@
-document.addEventListener('DOMContentLoaded', async function() {
-    await loadDepartamentos();
-    await loadUsuarios();
-    await loadMaquina();
-    await loadSoftware();
-    await loadSuprimento_PIP();
+document.addEventListener('DOMContentLoaded', () => {
+    if (!document.getElementById('relacionamento-page')) return;
+    
+    // Carrega usuários no dropdown
+    const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+    const selectUsuario = document.getElementById('select-usuario');
+    
+    selectUsuario.innerHTML = '<option value="">Selecione um usuário</option>';
+    usuarios.forEach(user => {
+        const option = document.createElement('option');
+        option.value = user.id;
+        option.textContent = user.nome;
+        selectUsuario.appendChild(option);
+    });
 
-    document.getElementById('relacionamento-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
+    // Evento para o botão Editar
+    document.getElementById('btn-editar-relacionamento').addEventListener('click', () => {
+        const usuarioId = document.getElementById('select-usuario').value;
+        if (usuarioId) iniciarModoEdicao(usuarioId);
+    });
 
-        const usuarioNome = document.getElementById('nomeUsuarioo').value;
-        const departamentoNome = document.getElementById('nomeDepartamentos').value;
-        const maquinaNome = document.getElementById('nomeMaquina').value;
-        const nomePib = document.getElementById('nomePip').value;
-        const nomeSoftware = document.getElementById('nomeSoftware').value;
+    // Evento para o botão Salvar
+    document.getElementById('btn-salvar-relacionamento').addEventListener('click', salvarEdicoes);
+});
 
-        console.log(usuarioNome)
-        console.log(departamentoNome)
-        console.log(maquinaNome)
-        console.log(nomePib)
-        console.log(nomeSoftware)
+function carregarRelacionamentos(usuarioId) {
+    const infoDiv = document.getElementById('info-relacionamento');
+    infoDiv.style.display = 'none';
+    
+    if (!usuarioId) return;
 
+    try {
+        // Busca os dados
+        const usuario = JSON.parse(localStorage.getItem('usuarios')).find(u => u.id == usuarioId);
+        const departamento = JSON.parse(localStorage.getItem('departamentos')).find(d => d.id == usuario.departamentoId);
+        const maquina = JSON.parse(localStorage.getItem('maquinas')).find(m => m.usuarioId == usuarioId);
+        const softwares = JSON.parse(localStorage.getItem('software')).filter(s => s.usuarioId == usuarioId) || [];
+        const pip = JSON.parse(localStorage.getItem('pip')).find(p => p.usuarioId == usuarioId);
 
+        // Monta os cards
+        infoDiv.innerHTML = `
+            <div class="relacionamento-card">
+                <div class="card-header">
+                    <i class="fas fa-user"></i>
+                    <h3>Usuário</h3>
+                </div>
+                <p><strong>Nome:</strong> ${usuario.nome}</p>
+                <p><strong>ID:</strong> ${usuario.id}</p>
+            </div>
 
-    if (!departamentoNome) {
-        showToast('Por favor, selecione um departamento', 'error');
-        return;
+            <div class="relacionamento-card">
+                <div class="card-header">
+                    <i class="fas fa-building"></i>
+                    <h3>Departamento</h3>
+                </div>
+                <p id="info-departamento">${departamento?.nome || 'Não atribuído'}</p>
+            </div>
+
+            <div class="relacionamento-card">
+                <div class="card-header">
+                    <i class="fas fa-laptop"></i>
+                    <h3>Máquina</h3>
+                </div>
+                <div id="info-maquina">
+                    ${maquina ? `
+                        <p><strong>Modelo:</strong> ${maquina.placa_mae}</p>
+                        <p><strong>Processador:</strong> ${maquina.processador}</p>
+                        <p><strong>Memória:</strong> ${maquina.memoria}</p>
+                    ` : '<p>Não atribuída</p>'}
+                </div>
+            </div>
+
+            <div class="relacionamento-card">
+                <div class="card-header">
+                    <i class="fas fa-code"></i>
+                    <h3>Softwares</h3>
+                </div>
+                <ul class="software-list" id="info-software">
+                    ${softwares.length > 0 ? 
+                        softwares.map(s => `
+                            <li>
+                                ${s.nome} 
+                                <small>(${s.serial})</small>
+                            </li>
+                        `).join('') 
+                        : '<li>Nenhum software vinculado</li>'}
+                </ul>
+            </div>
+
+            <div class="relacionamento-card">
+                <div class="card-header">
+                    <i class="fas fa-box"></i>
+                    <h3>PIP</h3>
+                </div>
+                <div id="info-pip">
+                    ${pip ? `
+                        <p><strong>Nome:</strong> ${pip.nome}</p>
+                        <p><strong>ID:</strong> ${pip.id}</p>
+                    ` : '<p>Não atribuído</p>'}
+                </div>
+            </div>
+        `;
+
+        infoDiv.style.display = 'grid';
+        document.getElementById('btn-editar-relacionamento').style.display = 'inline-block';
+        document.getElementById('btn-salvar-relacionamento').style.display = 'none';
+
+    } catch (error) {
+        console.error("Erro ao carregar:", error);
+        showToast('Erro ao carregar relacionamentos', 'error');
     }
+}
 
-    if (!maquinaNome) {
-        showToast('Por favor, selecione uma máquina', 'error');
-        return;
-    }
+// ========== FUNÇÕES DE EDIÇÃO ==========
+function iniciarModoEdicao(usuarioId) {
+    const usuario = JSON.parse(localStorage.getItem('usuarios')).find(u => u.id == usuarioId);
+    
+    // Adiciona classe de edição ao container
+    document.getElementById('info-relacionamento').classList.add('edit-mode');
 
-    if (!nomePib) {
-        showToast('Por favor, selecione um suprimento (PIB)', 'error');
-        return;
-    }
+    // Departamento
+    document.getElementById('info-departamento').innerHTML = `
+        <select id="editar-departamento" class="edit-select">
+            ${JSON.parse(localStorage.getItem('departamentos')).map(d => 
+                `<option value="${d.id}" ${d.id == usuario.departamentoId ? 'selected' : ''}>${d.nome}</option>`
+            ).join('')}
+        </select>
+    `;
 
-    if (!nomeSoftware) {
-        showToast('Por favor, selecione um software', 'error');
-        return;
-    }
+    // Máquina
+    document.getElementById('info-maquina').innerHTML = `
+        <select id="editar-maquina" class="edit-select">
+            <option value="">Nenhuma máquina</option>
+            ${JSON.parse(localStorage.getItem('maquinas')).map(m => 
+                `<option value="${m.id}" ${m.usuarioId == usuarioId ? 'selected' : ''}>
+                    ${m.placa_mae} (${m.processador})
+                </option>`
+            ).join('')}
+        </select>
+    `;
 
-        try {
-        const response = await fetch('http://localhost:8080/relacionamento', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                idDepartamento: departamentoNome,
-                idUsuario: usuarioNome,
-                idMaquina: maquinaNome,
-                idSoftware : nomeSoftware,
-                idSuprimento : nomePib
-            })
+    // Softwares
+    const softwares = JSON.parse(localStorage.getItem('software')) || [];
+    document.getElementById('info-software').innerHTML = `
+        <select id="editar-softwares" multiple class="edit-select">
+            ${softwares.map(s => 
+                `<option value="${s.id}" ${s.usuarioId == usuarioId ? 'selected' : ''}>
+                    ${s.nome} (${s.serial})
+                </option>`
+            ).join('')}
+        </select>
+        <small class="text-muted">Pressione Ctrl para selecionar múltiplos</small>
+    `;
+
+    // PIP
+    const pips = JSON.parse(localStorage.getItem('pip')) || [];
+    document.getElementById('info-pip').innerHTML = `
+        <select id="editar-pip" class="edit-select">
+            <option value="">Nenhum PIP</option>
+            ${pips.map(p => 
+                `<option value="${p.id}" ${p.usuarioId == usuarioId ? 'selected' : ''}>${p.nome}</option>`
+            ).join('')}
+        </select>
+    `;
+
+    // Atualiza botões
+    document.getElementById('btn-editar-relacionamento').style.display = 'none';
+    document.getElementById('btn-salvar-relacionamento').style.display = 'inline-block';
+}
+
+function salvarEdicoes() {
+    const usuarioId = document.getElementById('select-usuario').value;
+    if (!usuarioId) return;
+
+    try {
+        // 1. Atualiza Departamento
+        const novoDepartamentoId = document.getElementById('editar-departamento').value;
+        const usuarios = JSON.parse(localStorage.getItem('usuarios'));
+        const usuarioIndex = usuarios.findIndex(u => u.id == usuarioId);
+        usuarios[usuarioIndex].departamentoId = parseInt(novoDepartamentoId);
+
+        // 2. Atualiza Máquina
+        const novaMaquinaId = document.getElementById('editar-maquina').value;
+        const maquinas = JSON.parse(localStorage.getItem('maquinas'));
+        maquinas.forEach(m => {
+            m.usuarioId = m.id == parseInt(novaMaquinaId) ? usuarioId : null;
         });
 
-            if (response.ok) {
-                console.log('a response é: ' + response)
-                const data = await response.json();
-                showToast('Relacionamento salvo com sucesso!', 'success');
-                document.getElementById('relacionamento-form').reset();
-            } else {
-                const errorData = await response.json();
-                showToast(`Erro ao cadastrar: ${errorData.message || 'Erro desconhecido'}`, 'error');
-            }
-        } catch (error) {
-            console.error('Erro:', error);
-            showToast('Erro na conexão com o servidor', 'error');
-        }
+        // 3. Atualiza Softwares
+        const softwaresSelecionados = Array.from(
+            document.getElementById('editar-softwares').selectedOptions
+        ).map(opt => parseInt(opt.value));
+        
+        const softwares = JSON.parse(localStorage.getItem('software'));
+        softwares.forEach(s => {
+            s.usuarioId = softwaresSelecionados.includes(s.id) ? usuarioId : null;
+        });
 
-    });
-});
+        // 4. Atualiza PIP
+        const pipId = document.getElementById('editar-pip').value;
+        const pips = JSON.parse(localStorage.getItem('pip'));
+        pips.forEach(p => {
+            p.usuarioId = p.id == parseInt(pipId) ? usuarioId : null;
+        });
 
+        // Salva todas as alterações
+        localStorage.setItem('usuarios', JSON.stringify(usuarios));
+        localStorage.setItem('maquinas', JSON.stringify(maquinas));
+        localStorage.setItem('software', JSON.stringify(softwares));
+        localStorage.setItem('pip', JSON.stringify(pips));
 
-async function loadUsuarios() {
-    try {
-        const response = await fetch('http://localhost:8080/usuario');
-        if (response.ok) {
-            const usuarios = await response.json();
-            console.log('API Response:', usuarios); // Debug API response
-            const select = document.getElementById('nomeUsuarioo');
-            usuarios.forEach(usuario => {
-                const option = document.createElement('option');
-                option.value = usuario.idUsusario;
-                option.textContent = usuario.nomeUsuario;
-                select.append(option);  
-            });
-        } else {
-            console.error('Erro ao carregar usuarios');
-        }
+        showToast('Alterações salvas com sucesso!', 'success');
+        
+        // Volta para o modo visualização
+        carregarRelacionamentos(usuarioId);
+
     } catch (error) {
-        console.error('Erro:', error);
-    }
-}
-
-async function loadDepartamentos() {
-    try {
-        const response = await fetch('http://localhost:8080/departamento');
-        if (response.ok) {
-            const departamentos = await response.json();
-            console.log('API Response:', departamentos); // Debug API response
-            const select = document.getElementById('nomeDepartamentos');
-            departamentos.forEach(departamento => {
-                const option = document.createElement('option');
-                option.value = departamento.idDepartamento;
-                option.textContent = departamento.nomeDepartamento;
-                select.append(option);  
-            });
-        } else {
-            console.error('Erro ao carregar departamentos');
-        }
-    } catch (error) {
-        console.error('Erro:', error);
-    }
-}
-
-
-async function loadMaquina() {
-    try {
-        const response = await fetch('http://localhost:8080/maquina');
-        if (response.ok) {
-            const maquinas = await response.json();
-            console.log('API Response:', maquinas); // Debug API response
-            const select = document.getElementById('nomeMaquina');
-            maquinas.forEach(maquina => {
-                const option = document.createElement('option');
-                option.value = maquina.idMaquina;
-                option.textContent = maquina.placaMae;
-                select.append(option);  
-            });
-        } else {
-            console.error('Erro ao carregar departamentos');
-        }
-    } catch (error) {
-        console.error('Erro:', error);
-    }
-}
-
-async function loadSuprimento_PIP() {
-    try {
-        const response = await fetch('http://localhost:8080/suprimento');
-        if (response.ok) {
-            const suprimentos = await response.json();
-            console.log('API Response:', suprimentos); // Debug API response
-            const select = document.getElementById('nomePip');
-            suprimentos.forEach(suprimento => {
-                const option = document.createElement('option');
-                option.value = suprimento.idSuprimento;
-                option.textContent = suprimento.nomeSuprimento;
-                select.append(option);  
-            });
-        } else {
-            console.error('Erro ao carregar departamentos');
-        }
-    } catch (error) {
-        console.error('Erro:', error);
-    }
-}
-
-async function loadSoftware() {
-    try {
-        const response = await fetch('http://localhost:8080/software');
-        if (response.ok) {
-            const softwares = await response.json();
-            console.log('API Response:', softwares); // Debug API response
-            const select = document.getElementById('nomeSoftware');
-            softwares.forEach(software => {
-                const option = document.createElement('option');
-                option.value = software.idSoftware;
-                option.textContent = software.nomeSoftware;
-                select.append(option);  
-            });
-        } else {
-            console.error('Erro ao carregar departamentos');
-        }
-    } catch (error) {
-        console.error('Erro:', error);
-    }
-}
-
-
-document.getElementById('nomeMaquina').addEventListener('change', async function() {
-    const maquinaId = this.value;
-    if (maquinaId) {
-        const maquina = await fetchMaquina(maquinaId);
-        if (maquina) {
-            document.getElementById('marcaProcessador').value = maquina.marcaProcessador;
-            document.getElementById('processador').value = maquina.processador;
-            document.getElementById('modeloMemoria').value = maquina.modeloMemoria;
-            document.getElementById('frequenciaMemoria').value = maquina.frequenciaMemoria;
-            document.getElementById('quantidadeMemoria').value = maquina.quantidadeMemoria;
-            document.getElementById('tipoArmazenamento').value = maquina.tipoArmazenamento;
-            document.getElementById('quantidadeArmazenamento').value = maquina.quantidadeArmazenamento;
-
-            document.getElementById('subform-maquina').style.display = 'block';
-        }
-    } else {
-        document.getElementById('subform-maquina').style.display = 'none';
-    }
-});
-
-async function fetchMaquina(maquinaId) {
-    try {
-        const response = await fetch(`http://localhost:8080/maquina/${maquinaId}`);
-        if (response.ok) {
-            return await response.json();
-        } else {
-            console.error('Erro ao carregar a máquina');
-            return null;
-        }
-    } catch (error) {
-        console.error('Erro:', error);
-        return null;
+        console.error("Erro ao salvar:", error);
+        showToast('Erro ao salvar alterações', 'error');
     }
 }
