@@ -1,129 +1,222 @@
-async function fetchData() {
-    try {
-        const response = await fetch('http://localhost:8080/relacionamento');
-        const data = await response.json();
-        populateTable(data);
-    } catch (error) {
-        console.error('Erro ao buscar dados:', error);
-    }
-}
+// 1. Variável global para relacionamentos
+const relacionamentos = {
+    usuarios: JSON.parse(localStorage.getItem('usuarios')) || [],
+    maquinas: JSON.parse(localStorage.getItem('maquinas')) || [],
+    pips: JSON.parse(localStorage.getItem('pip')) || [],
+    softwares: JSON.parse(localStorage.getItem('software')) || [],
+    departamentos: JSON.parse(localStorage.getItem('departamentos')) || []
+};
 
-function populateTable(data) {
-    const tbody = document.getElementById('inventory-body');
-    tbody.innerHTML = '';
-
-    data.forEach(item => {
-        const row = document.createElement('tr');
-
-        // Nome
-        const nomeId = document.createElement('td');
-        nomeId.textContent = item.usuario.nomeUsuario;
-        row.appendChild(nomeId);
-
-        // Departamento
-        const departamentoId = document.createElement('td');
-        departamentoId.textContent = item.usuario.departamento.nomeDepartamento;
-        row.appendChild(departamentoId);
-
-        // Máquina
-        const detalhes = document.createElement('td');
-        detalhes.textContent = item.maquina.placaMae;
-        row.appendChild(detalhes);
-
-        // Software
-        const softwareId = document.createElement('td');
-        softwareId.textContent = item.software.nomeSoftware;
-        row.appendChild(softwareId);
-
-        // PIP
-        const pip = document.createElement('td');
-        pip.textContent = item.suprimento.nomeSuprimento;
-        row.appendChild(pip);
-
-        const acoes = document.createElement('td');
-        const deleteButton = document.createElement('button');
-        deleteButton.innerHTML = `<i class="fas fa-trash-alt"></i> Apagar`;
-        deleteButton.onclick = () => deleteItem(item.idRelacionamento);
-
-        deleteButton.style.backgroundColor = '#6c757d';
-        deleteButton.style.color = 'white';
-        deleteButton.style.border = 'none';
-        deleteButton.style.borderRadius = '6px';
-        deleteButton.style.padding = '6px 12px';
-        deleteButton.style.fontSize = '14px';
-        deleteButton.style.cursor = 'pointer';
-        deleteButton.style.display = 'inline-flex';
-        deleteButton.style.alignItems = 'center';
-        deleteButton.style.gap = '6px';
-                       
-        acoes.appendChild(deleteButton);
-        row.appendChild(acoes);
-        row.onclick = () => mostrarDetalhes(item);
-        tbody.appendChild(row);
+// 2. Função de filtro 
+function filterInventory() {
+    const term = document.getElementById('inventory-search').value.toLowerCase();
+    const rows = document.querySelectorAll('#inventory-body tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(term) ? '' : 'none';
     });
 }
 
+// 3. Função para mostrar detalhes 
+window.mostrarDetalhesUsuario = function(usuarioId) {
+    const usuario = relacionamentos.usuarios.find(u => u.id === usuarioId);
+    if (!usuario) return;
 
-async function deleteItem(id) {
-    const confirmacao = confirm("Tem certeza que deseja excluir este relacionamento?");
-    if (!confirmacao) return;
+    document.getElementById('detalhes-nome-usuario').textContent = usuario.nome;
+    document.getElementById('detalhes-departamento').textContent = 
+        relacionamentos.departamentos.find(d => d.id === usuario.departamentoId)?.nome || 'N/A';
 
-    try {
-        const response = await fetch(`http://localhost:8080/relacionamento/${id}`, {
-            method: 'DELETE'
-        });
-
-        if (response.ok) {
-            alert("Item excluído com sucesso!");
-            fetchData();
-        } else {
-            alert("Erro ao excluir o item.");
-        }
-    } catch (error) {
-        console.error("Erro ao excluir:", error);
-        alert("Erro ao excluir o item.");
+    const maquinaVinculada = relacionamentos.maquinas.find(m => m.usuarioId === usuarioId);
+    if (maquinaVinculada) {
+        document.getElementById('maquina-modelo').textContent = maquinaVinculada.placa_mae;
+        document.getElementById('maquina-cpu').textContent = maquinaVinculada.processador;
+        document.getElementById('maquina-ram').textContent = maquinaVinculada.memoria;
     }
-}
 
-// Função que exibe os dados no card
-function mostrarDetalhes(item) {
-    document.getElementById('detalhes-usuario').style.display = 'block';
+    const pipVinculado = relacionamentos.pips.find(p => p.usuarioId === usuarioId);
+    if (pipVinculado) {
+        document.getElementById('pip-codigo').textContent = pipVinculado.codigo;
+        document.getElementById('pip-data').textContent = 
+            new Date(pipVinculado.dataCadastro).toLocaleDateString('pt-BR');
+    }
 
-    // Nome
-    document.getElementById('detalhes-nome-usuario').textContent = item.usuario.nomeUsuario;
-
-    // Departamento
-    document.getElementById('detalhes-departamento').textContent = item.usuario.departamento.nomeDepartamento;
-
-    // Máquina
-    document.getElementById('maquina-modelo').textContent = item.maquina.modelo;
-    document.getElementById('maquina-cpu').textContent = item.maquina.processador;
-    document.getElementById('maquina-ram').textContent = item.maquina.memoriaRam;
-
-    // PIP
-    document.getElementById('pip-codigo').textContent = item.suprimento.codigoSuprimento;
-    document.getElementById('pip-data').textContent = item.suprimento.dataEntrega;
-
-    // Software (tratando caso seja array ou único objeto)
     const softwareList = document.getElementById('detalhes-software');
     softwareList.innerHTML = '';
-
-    if (Array.isArray(item.software)) {
-        item.software.forEach(soft => {
+    relacionamentos.softwares
+        .filter(s => s.usuarioId === usuarioId)
+        .forEach(soft => {
             const li = document.createElement('li');
-            li.textContent = soft.nomeSoftware;
+            li.textContent = `${soft.nome} (${soft.serial})`;
             softwareList.appendChild(li);
         });
-    } else {
-        const li = document.createElement('li');
-        li.textContent = item.software.nomeSoftware;
-        softwareList.appendChild(li);
+
+    document.getElementById('detalhes-usuario').style.display = 'block';
+};
+
+// 4. Função para fechar detalhes
+window.fecharDetalhes = function() {
+    document.getElementById('detalhes-usuario').style.display = 'none';
+};
+
+// 5. Simulação de dados
+function simularDadosTeste() {
+    if (!window.location.href.includes("index.html")) return;
+
+    if (!localStorage.getItem('usuarios')) {
+        console.warn("⚠️ Criando dados de teste...");
+        
+        const mockData = {
+            usuarios: [
+                { id: 1, nome: "João Silva (TESTE)", departamentoId: 1, dataCadastro: new Date() }
+            ],
+            departamentos: [
+                { id: 1, nome: "TI-MOCK" }
+            ],
+            maquinas: [
+                { 
+                    id: 101, 
+                    placa_mae: "MOCK-DELL", 
+                    processador: "i7-MOCK", 
+                    memoria: "16GB",
+                    usuarioId: 1
+                }
+            ],
+            pip: [
+                { id: 201, codigo: "PIP-TESTE", usuarioId: 1, dataCadastro: new Date() }
+            ],
+            software: [
+                { id: 301, nome: "Windows", serial: "123-456", usuarioId: 1 }
+            ]
+        };
+
+        Object.entries(mockData).forEach(([key, value]) => {
+            localStorage.setItem(key, JSON.stringify(value));
+        });
     }
 }
 
+// 6. Carregar inventário
+function loadFullInventory() {
+    const tbody = document.getElementById('inventory-body');
+    if (!tbody) {
+        console.error("Elemento 'inventory-body' não encontrado!");
+        return;
+    }
+    
+    tbody.innerHTML = '';
 
-function fecharDetalhes() {
-    document.getElementById('detalhes-usuario').style.display = 'none';
+    // Adiciona usuários
+    relacionamentos.usuarios.forEach(usuario => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><span class="badge usuário">USUÁRIO</span></td>
+            <td>${usuario.nome}</td>
+            <td>Depto: ${relacionamentos.departamentos.find(d => d.id === usuario.departamentoId)?.nome || 'N/A'}</td>
+            <td>${new Date(usuario.dataCadastro).toLocaleDateString('pt-BR')}</td>
+            <td class="actions">
+                <button onclick="mostrarDetalhesUsuario(${usuario.id})">
+                    <i class="fas fa-search"></i> Detalhes
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    // Adicionar outras categorias aqui caso seja nescessario
 }
 
-window.onload = fetchData;
+// 7. Inicialização
+function initInventory() {
+    try {
+        if (!document.getElementById('list-page')) return;
+
+        simularDadosTeste();
+        loadFullInventory();
+
+        const searchInput = document.getElementById('inventory-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', filterInventory);
+        }
+
+    } catch (error) {
+        console.error("Erro ao inicializar inventário:", error);
+    }
+}
+
+// 8. Iniciar quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', initInventory);
+
+// Função para gerar o relatório completo
+function gerarRelatorioGeral() {
+    const dados = {
+        usuarios: JSON.parse(localStorage.getItem('usuarios')) || [],
+        departamentos: JSON.parse(localStorage.getItem('departamentos')) || [],
+        maquinas: JSON.parse(localStorage.getItem('maquinas')) || [],
+        softwares: JSON.parse(localStorage.getItem('software')) || [],
+        pips: JSON.parse(localStorage.getItem('pip')) || []
+    };
+
+    const tbody = document.getElementById('inventory-body');
+    tbody.innerHTML = '';
+
+    // Adiciona todos os itens ao inventário
+    Object.entries(dados).forEach(([tipo, itens]) => {
+        itens.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><span class="badge ${tipo}">${tipo.toUpperCase()}</span></td>
+                <td>${item.nome || item.placa_mae || 'Sem nome'}</td>
+                <td>${item.usuarioId ? `Vinculado ao usuário ${item.usuarioId}` : 'Sem vínculo'}</td>
+                <td>${new Date().toLocaleDateString('pt-BR')}</td>
+                <td class="actions">
+                    <button onclick="mostrarDetalhesItem('${tipo}', ${item.id})">
+                        <i class="fas fa-search"></i> Detalhes
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    });
+}
+
+// Chama a função quando a página carrega
+document.addEventListener('DOMContentLoaded', gerarRelatorioGeral);
+
+// Função para criar dados de teste 
+function criarDadosTeste() {
+    if (localStorage.getItem('dadosTesteCriados')) return;
+
+    console.log("Criando dados de teste...");
+    
+    const dadosTeste = {
+        usuarios: [
+            { id: 1, nome: "João Silva", departamentoId: 1 }
+        ],
+        departamentos: [
+            { id: 1, nome: "TI" }
+        ],
+        maquinas: [
+            { id: 1, placa_mae: "Dell XPS 15", processador: "i7-11800H", memoria: "16GB", usuarioId: 1 }
+        ],
+        software: [
+            { id: 1, nome: "Windows 10", serial: "WIN-123", usuarioId: 1 }
+        ],
+        pip: [
+            { id: 1, nome: "PIP-2023-001", usuarioId: 1 }
+        ]
+    };
+
+    Object.entries(dadosTeste).forEach(([key, value]) => {
+        localStorage.setItem(key, JSON.stringify(value));
+    });
+    
+    localStorage.setItem('dadosTesteCriados', 'true');
+    console.log("✅ Dados de teste criados com sucesso!");
+}
+
+// event listener 
+document.addEventListener('DOMContentLoaded', () => {
+    criarDadosTeste();
+    initInventory(); // Sua função existente
+});
