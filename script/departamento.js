@@ -45,4 +45,3 @@ responseElement.style.display = 'block';
         responseElement.style.display = 'none';
     }, 5000);
 }
-

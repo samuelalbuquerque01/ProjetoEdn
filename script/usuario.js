@@ -65,4 +65,3 @@ async function loadDepartamentos() {
         console.error('Erro:', error);
     }
 }
-

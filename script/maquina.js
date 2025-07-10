@@ -2,22 +2,47 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('maquina-form').addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        const placa_mae = document.getElementById('placa-mae').value.trim();
-        const marca_processador = document.getElementById('marca-processador').value;
-        const processador = document.getElementById('processador').value.trim();
-        const modelo_memoria = document.getElementById('modelo-memoria').value;
-        const frequencia_memoria = document.getElementById('frequencia-memoria').value.split(' ')[0];
-        const quantidade_memoria = document.getElementById('quantidade-memoria').value.trim();
-        const tipo_armazenamento = document.getElementById('tipo-armazenamento').value;
-        const quantidade_armazenamento = document.getElementById('quantidade-armazenamento').value.trim();
+    const placa_mae = document.getElementById('placa-mae').value.trim();
+    const marca_processador = document.getElementById('marca-processador').value.trim();
+    const processador = document.getElementById('processador').value.trim();
+    const modelo_memoria = document.getElementById('modelo-memoria').value.trim();
+    const frequencia_memoria = document.getElementById('frequencia-memoria').value.trim();
+    const quantidade_memoria = document.getElementById('quantidade-memoria').value.trim();
+    const tipo_armazenamento = document.getElementById('tipo-armazenamento').value.trim();
+    const quantidade_armazenamento = document.getElementById('quantidade-armazenamento').value.trim();
 
-        // Validações (mantenha as existentes e adicione para os novos campos)
-        if (!placa_mae || !marca_processador || !processador || !modelo_memoria || 
-            !frequencia_memoria || !quantidade_memoria || !tipo_armazenamento || !quantidade_armazenamento) {
-            showToast('POR FAVOR, PREENCHA TODOS OS CAMPOS', 'error');
-            return;
-        }
-
+    if (!placa_mae) {
+        showMessage('Por favor, digite a placa mãe', 'error');
+        return false;
+    }
+    if (!marca_processador) {
+        showMessage('Por favor, digite a marca do processador', 'error');
+        return false;
+    }
+    if (!processador) {
+        showMessage('Por favor, digite o nome do processador', 'error');
+        return false;
+    }
+    
+    if (!modelo_memoria) {
+        showMessage('Por favor, digite o modelo da memória', 'error');
+        return false;
+    }
+    if (!frequencia_memoria) {
+        showMessage('Por favor, digite a frequência da memória', 'error');
+        return false;
+    }
+    if (!quantidade_memoria) {
+        showMessage('Por favor, digite a quantidade de memória', 'error');
+        return false;
+    }
+    if (!tipo_armazenamento) {
+        showMessage('Por favor, digite o tipo de memória', 'error');
+        return false;
+    }
+    if (!quantidade_armazenamento) {
+        showMessage('Por favor, digite a quantidade de armazenamento', 'error');
+}
         try {
             const response = await fetch('http://localhost:8080/maquina', {
                 method: 'POST',

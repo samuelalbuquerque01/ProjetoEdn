@@ -76,5 +76,3 @@ function limparForm(formId) {
         showToast('Formulário limpo', 'info');
     }
 }
-   
-   
