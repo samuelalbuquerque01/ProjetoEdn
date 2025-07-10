@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async function() {
-    await loadDepartamentos();
+    await loadDepartamentosRelacionamento();
     await loadUsuarios();
     await loadMaquina();
     await loadSoftware();
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         e.preventDefault();
 
         const usuarioNome = document.getElementById('nomeUsuarioo').value;
-        const departamentoNome = document.getElementById('nomeDepartamentos').value;
+        const departamentoNome = document.getElementById('relacionamento-departamento').value;
         const maquinaNome = document.getElementById('nomeMaquina').value;
         const nomePib = document.getElementById('nomePip').value;
         const nomeSoftware = document.getElementById('nomeSoftware').value;
@@ -96,13 +96,13 @@ async function loadUsuarios() {
     }
 }
 
-async function loadDepartamentos() {
+async function loadDepartamentosRelacionamento() {
     try {
         const response = await fetch('http://localhost:8080/departamento');
         if (response.ok) {
             const departamentos = await response.json();
             console.log('API Response:', departamentos); // Debug API response
-            const select = document.getElementById('nomeDepartamentos');
+            const select = document.getElementById('relacionamento-departamento');
             departamentos.forEach(departamento => {
                 const option = document.createElement('option');
                 option.value = departamento.idDepartamento;

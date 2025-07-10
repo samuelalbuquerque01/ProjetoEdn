@@ -4,12 +4,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const placa_mae = document.getElementById('placa-mae').value.trim();
     const marca_processador = document.getElementById('marca-processador').value.trim();
-    const processador = document.getElementById('processador').value.trim();
+    const processador = document.getElementById('processador-maquina').value.trim();
     const modelo_memoria = document.getElementById('modelo-memoria').value.trim();
     const frequencia_memoria = document.getElementById('frequencia-memoria').value.trim();
     const quantidade_memoria = document.getElementById('quantidade-memoria').value.trim();
     const tipo_armazenamento = document.getElementById('tipo-armazenamento').value.trim();
     const quantidade_armazenamento = document.getElementById('quantidade-armazenamento').value.trim();
+
+    console.log('placa_mae:', placa_mae);
+    console.log('marca_processador:', marca_processador);
+    console.log('processador:', processador);
+    console.log('modelo_memoria:', modelo_memoria);
+    console.log('frequencia_memoria:', frequencia_memoria);
+    console.log('quantidade_memoria:', quantidade_memoria);
+    console.log('tipo_armazenamento:', tipo_armazenamento);
+    console.log('quantidade_armazenamento:', quantidade_armazenamento);
+
 
     if (!placa_mae) {
         showMessage('Por favor, digite a placa mãe', 'error');
