@@ -104,7 +104,7 @@ function mostrarDetalhes(item) {
     document.getElementById('pip-codigo').textContent = item.suprimento.codigoSuprimento;
     document.getElementById('pip-data').textContent = item.suprimento.dataEntrega;
 
-    // Software (tratando caso seja array ou único objeto)
+    // Software 
     const softwareList = document.getElementById('detalhes-software');
     softwareList.innerHTML = '';
 
