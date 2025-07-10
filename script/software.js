@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('software-form').addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    const nomeSoftware = document.getElementById('nomeSoftware').value.trim();
-    const nomeSerial = document.getElementById('nomeSerial').value.trim();
+    const nomeSoftware = document.getElementById('nomeSoftwaree').value.trim();
+    const nomeSerial = document.getElementById('nomeSeriall').value.trim();
 
 
     if (!nomeSoftware) {
