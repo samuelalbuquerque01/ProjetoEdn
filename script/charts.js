@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', async function() {
 
   await loadTotalItens();
+  await loadTotalMaquinas();
+  await loadUltimoCadastro();
 
 });
 
@@ -17,9 +19,74 @@ async function loadTotalItens() {
             const option = document.createElement('option');
             option.value = totalItens;
             option.textContent = totalItens;
+            
+            option.style.color = 'white';
+            option.style.fontWeight = 'bold';
+            select.style.color = 'white';
+            select.style.fontWeight = 'bold';
+            
             select.appendChild(option);
         } else {
             console.error('Erro ao carregar total de itens');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+    }
+}
+
+
+async function loadTotalMaquinas() {
+    try {
+        const response = await fetch('http://localhost:8080/maquina/itens');
+        if (response.ok) {
+            const totalMaquinas = await response.json();
+            console.log('API Response:', totalMaquinas);
+
+            const select = document.getElementById('total-maquinas');
+            select.innerHTML = '';
+
+            const option = document.createElement('option');
+            option.value = totalMaquinas;
+            option.textContent = totalMaquinas;
+
+            option.style.color = 'white';
+            option.style.fontWeight = 'bold';
+            select.style.color = 'white';
+            select.style.fontWeight = 'bold';
+
+            select.appendChild(option);
+        } else {
+            console.error('Erro ao carregar total de itens');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+    }
+}
+
+async function loadUltimoCadastro() {
+    try {
+        const response = await fetch('http://localhost:8080/relacionamento/cadastro');
+        if (response.ok) {
+            const ultimoCadastro = await response.json();
+            console.log('API Response:', ultimoCadastro);
+
+            const select = document.getElementById('last-item');
+            select.innerHTML = '';
+
+            const option = document.createElement('option');
+            option.value = ultimoCadastro.dataRegistro;
+            const [ano, mes, dia] = ultimoCadastro.dataRegistro.split('-');
+            const dataFormatada = `${mes}-${dia}-${ano}`;
+            option.textContent = dataFormatada;
+
+            option.style.color = 'white';
+            option.style.fontWeight = 'bold';
+            select.style.color = 'white';
+            select.style.fontWeight = 'bold';
+
+            select.appendChild(option);
+        } else {
+            console.error('Erro ao carregar ultimo cadastro');
         }
     } catch (error) {
         console.error('Erro:', error);

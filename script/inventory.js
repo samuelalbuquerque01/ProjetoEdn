@@ -37,7 +37,7 @@ function populateTable(data) {
 
         // PIP
         const pip = document.createElement('td');
-        pip.textContent = item.suprimento.nomeSuprimento;
+        pip.textContent = item.pip.nomePip;
         row.appendChild(pip);
 
         const acoes = document.createElement('td');

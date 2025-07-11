@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     await loadUsuarios();
     await loadMaquina();
     await loadSoftware();
-    await loadSuprimento_PIP();
+    await loadPIP();
 
     document.getElementById('relacionamento-form').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -139,17 +139,17 @@ async function loadMaquina() {
     }
 }
 
-async function loadSuprimento_PIP() {
+async function loadPIP() {
     try {
-        const response = await fetch('http://localhost:8080/suprimento');
+        const response = await fetch('http://localhost:8080/pip');
         if (response.ok) {
-            const suprimentos = await response.json();
-            console.log('API Response:', suprimentos); // Debug API response
+            const pips = await response.json();
+            console.log('API Response:', pips); // Debug API response
             const select = document.getElementById('nomePip');
-            suprimentos.forEach(suprimento => {
+            pips.forEach(pip => {
                 const option = document.createElement('option');
-                option.value = suprimento.idSuprimento;
-                option.textContent = suprimento.nomeSuprimento;
+                option.value = pip.idPip;
+                option.textContent = pip.nomePip;
                 select.append(option);  
             });
         } else {
