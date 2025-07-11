@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', async function() {
 
   await loadTotalItens();
+  await loadTotalMaquinas();
 
 });
 
@@ -17,6 +18,41 @@ async function loadTotalItens() {
             const option = document.createElement('option');
             option.value = totalItens;
             option.textContent = totalItens;
+            
+            option.style.color = 'white';
+            option.style.fontWeight = 'bold';
+            select.style.color = 'white';
+            select.style.fontWeight = 'bold';
+            
+            select.appendChild(option);
+        } else {
+            console.error('Erro ao carregar total de itens');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+    }
+}
+
+
+async function loadTotalMaquinas() {
+    try {
+        const response = await fetch('http://localhost:8080/maquina/itens');
+        if (response.ok) {
+            const totalMaquinas = await response.json();
+            console.log('API Response:', totalMaquinas);
+
+            const select = document.getElementById('total-maquinas');
+            select.innerHTML = '';
+
+            const option = document.createElement('option');
+            option.value = totalMaquinas;
+            option.textContent = totalMaquinas;
+
+            option.style.color = 'white';
+            option.style.fontWeight = 'bold';
+            select.style.color = 'white';
+            select.style.fontWeight = 'bold';
+
             select.appendChild(option);
         } else {
             console.error('Erro ao carregar total de itens');

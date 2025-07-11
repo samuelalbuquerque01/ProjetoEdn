@@ -1,27 +1,46 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('pip-form');
-    
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-        data.tipo = "PIP"; // Adiciona o tipo para a listagem
-        
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('pip-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const nomePip = document.getElementById('nome-Pip').value;
+    const descricaoPip = document.getElementById('descricaoPip').value;
+
+    console.log(nomePip);
+    console.log(descricaoPip);
+
+
+    if (!nomePip) {
+        showMessage('Por favor, digite um nome para o PIP', 'error');
+        return;
+    }
+
+    if (!descricaoPip) {
+    showMessage('Por favor, digite uma descrição para o PIP', 'error');
+    return;
+}
         try {
-            // Simulação: 
-            data.id = Date.now();
-            data.dateCreated = new Date().toISOString();
-            
-            let inventories = JSON.parse(localStorage.getItem('inventories')) || [];
-            inventories.push(data);
-            localStorage.setItem('inventories', JSON.stringify(inventories));
-            
+        const response = await fetch('http://localhost:8080/pip', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nome: nomePip,
+                descricao: descricaoPip
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
             showToast('PIP salvo com sucesso!', 'success');
-            form.reset();
-            renderTable(); // Atualiza a tabela se estiver visível
-        } catch (err) {
-            console.error(err);
-            showToast('Erro ao salvar PIP', 'error');
+            document.getElementById('pip-form').reset();
+        } else {
+            const errorData = await response.json();
+            showToast(`Erro ao cadastrar: ${errorData.message || 'Erro desconhecido'}`, 'error');
         }
+    } catch (error) {
+        console.error('Erro:', error);
+        showToast('Erro na conexão com o servidor', 'error');
+    }
     });
 });
