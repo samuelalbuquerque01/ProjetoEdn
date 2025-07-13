@@ -149,4 +149,15 @@ async function exportToCSV() {
     }
 }
 
+document.getElementById('inventory-search').addEventListener('input', function () {
+    const termoBusca = this.value.toLowerCase().trim();
+    const linhas = document.querySelectorAll('#inventory-body tr');
+
+    linhas.forEach(linha => {
+        const textoLinha = linha.textContent.toLowerCase();
+        const corresponde = textoLinha.includes(termoBusca);
+        linha.style.display = corresponde ? '' : 'none';
+    });
+});
+
 window.onload = fetchData;
