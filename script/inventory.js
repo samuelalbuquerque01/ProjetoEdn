@@ -43,7 +43,7 @@ function populateTable(data) {
         const acoes = document.createElement('td');
         const deleteButton = document.createElement('button');
         deleteButton.innerHTML = `<i class="fas fa-trash-alt"></i> Apagar`;
-        deleteButton.onclick = () => deleteItem(item.idRelacionamento);
+        deleteButton.onclick = () => deleteItem(item.idUsuMaqSoftPip);
 
         deleteButton.style.backgroundColor = '#6c757d';
         deleteButton.style.color = 'white';
@@ -66,6 +66,7 @@ function populateTable(data) {
 
 async function deleteItem(id) {
     const confirmacao = confirm("Tem certeza que deseja excluir este relacionamento?");
+    console.log(id + "Para deleção")
     if (!confirmacao) return;
 
     try {
@@ -96,34 +97,56 @@ function mostrarDetalhes(item) {
     document.getElementById('detalhes-departamento').textContent = item.usuario.departamento.nomeDepartamento;
 
     // Máquina
-    document.getElementById('maquina-modelo').textContent = item.maquina.modelo;
+    document.getElementById('maquina-modelo').textContent = item.maquina.placaMae;
     document.getElementById('maquina-cpu').textContent = item.maquina.processador;
-    document.getElementById('maquina-ram').textContent = item.maquina.memoriaRam;
+    document.getElementById('maquina-ram').textContent = item.maquina.quantidadeMemoria + " GB";
 
     // PIP
-    document.getElementById('pip-codigo').textContent = item.suprimento.codigoSuprimento;
-    document.getElementById('pip-data').textContent = item.suprimento.dataEntrega;
+    document.getElementById('pip-codigo').textContent = item.pip.nomePip;
+
+    const dataBruta = item.pip.dataCadastro.split('T')[0];
+    const [ano, mes, dia] = dataBruta.split('-');
+    const dataFormatada = `${dia}/${mes}/${ano}`; // Formato DD/MM/AAAA
+    document.getElementById('pip-data').textContent = dataFormatada;
 
     // Software 
-    const softwareList = document.getElementById('detalhes-software');
-    softwareList.innerHTML = '';
-
-    if (Array.isArray(item.software)) {
-        item.software.forEach(soft => {
-            const li = document.createElement('li');
-            li.textContent = soft.nomeSoftware;
-            softwareList.appendChild(li);
-        });
-    } else {
-        const li = document.createElement('li');
-        li.textContent = item.software.nomeSoftware;
-        softwareList.appendChild(li);
-    }
+    document.getElementById('nome-software').textContent = item.software.nomeSoftware;
+    document.getElementById('serial-software').textContent = item.software.serialSoftware;
 }
 
 
 function fecharDetalhes() {
     document.getElementById('detalhes-usuario').style.display = 'none';
+}
+
+
+async function exportToCSV() {
+    try {
+        const response = await fetch('http://localhost:8080/exportar', {
+        method: 'GET',
+        });
+
+        if (!response.ok) {
+        throw new Error('Erro ao exportar dados');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+
+        // Nome do arquivo que será salvo
+        a.download = 'inventario.xlsx';
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Erro ao exportar:', error);
+        alert('Falha ao exportar os dados.');
+    }
 }
 
 window.onload = fetchData;
