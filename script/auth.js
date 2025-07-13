@@ -37,8 +37,8 @@ function showToast(message, type = 'info') {
   }, 3000);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('form-login').addEventListener('submit', async (event) => {
+
+document.getElementById('form-login').addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const email = document.getElementById('email').value.trim();
@@ -81,5 +81,4 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error(err);
       showToast('Não foi possível entrar. Tente novamente.', 'error');
   }
-  });
 });

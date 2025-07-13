@@ -73,10 +73,13 @@ async function loadUltimoCadastro() {
             const select = document.getElementById('last-item');
             select.innerHTML = '';
 
+            // Extrair apenas a data (YYYY-MM-DD)
+            const dataBruta = ultimoCadastro.dataCadastro.split('T')[0];
+            const [ano, mes, dia] = dataBruta.split('-');
+            const dataFormatada = `${dia}/${mes}/${ano}`; // Formato DD/MM/AAAA
+
             const option = document.createElement('option');
-            option.value = ultimoCadastro.dataRegistro;
-            const [ano, mes, dia] = ultimoCadastro.dataRegistro.split('-');
-            const dataFormatada = `${mes}-${dia}-${ano}`;
+            option.value = ultimoCadastro.dataCadastro;
             option.textContent = dataFormatada;
 
             option.style.color = 'white';
