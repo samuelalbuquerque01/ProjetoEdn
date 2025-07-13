@@ -37,47 +37,49 @@ function showToast(message, type = 'info') {
   }, 3000);
 }
 
-document.getElementById('form-login').addEventListener('submit', async (event) => {
-  event.preventDefault();
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('form-login').addEventListener('submit', async (event) => {
+    event.preventDefault();
 
-  const email = document.getElementById('email').value.trim();
-  const senha = document.getElementById('senha').value;
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
 
-  try {
-    const response = await fetch('http://localhost:8080/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, senha })
-    });
+    try {
+      const response = await fetch('http://localhost:8080/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
+      });
 
-    if (!response.ok) {
-      // 400‒499 → erro de credencial; 500+ → erro do servidor
-      const msg = response.status === 401 ? 'Credenciais inválidas!' : 'Erro ao fazer login.';
-      showToast(msg, 'error');
-      return;
-    }
+      if (!response.ok) {
+        // 400‒499 → erro de credencial; 500+ → erro do servidor
+        const msg = response.status === 401 ? 'Credenciais inválidas!' : 'Erro ao fazer login.';
+        showToast(msg, 'error');
+        return;
+      }
 
-    const { token } = await response.json();
-    localStorage.setItem('token', token);         // grava token
-    const payload = parseJwt(token);              // extrai dados do JWT
-    const role = payload?.role || 'user';         // ajuste se o claim tiver outro nome
+      const { token } = await response.json();
+      localStorage.setItem('token', token);         // grava token
+      const payload = parseJwt(token);              // extrai dados do JWT
+      const role = payload?.role || 'user';         // ajuste se o claim tiver outro nome
 
-    // guarda o papel para usar depois
-    localStorage.setItem('role', role);
+      // guarda o papel para usar depois
+      localStorage.setItem('role', role);
 
-  // oculta/mostra seções de acordo com o papel
-    if (role !== 'user') {
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-    } else {
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
-    }
-    // Redireciona para a tela da aplicação
-    localStorage.setItem('lastLoginEmail', payload.sub || email);
-    window.location.href = 'index.html?login=success'; // Adiciona parâmetro na URL
-    // Exibe mensagem de boas-vindas
-    showToast(`Bem‑vindo, ${payload.sub || email}!`, 'success');
-} catch (err) {
-    console.error(err);
-    showToast('Não foi possível entrar. Tente novamente.', 'error');
-}
+    // oculta/mostra seções de acordo com o papel
+      if (role !== 'user') {
+          document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+      } else {
+          document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+      }
+      // Redireciona para a tela da aplicação
+      localStorage.setItem('lastLoginEmail', payload.sub || email);
+      window.location.href = 'index.html?login=success'; // Adiciona parâmetro na URL
+      // Exibe mensagem de boas-vindas
+      showToast(`Bem‑vindo, ${payload.sub || email}!`, 'success');
+  } catch (err) {
+      console.error(err);
+      showToast('Não foi possível entrar. Tente novamente.', 'error');
+  }
+  });
 });
