@@ -1,218 +1,194 @@
 document.addEventListener('DOMContentLoaded', async function() {
-    await loadDepartamentosRelacionamento();
-    await loadUsuarios();
-    await loadMaquina();
-    await loadSoftware();
-    await loadPIP();
+    // Verifica autenticação
+    if (!checkAuth()) return;
 
+    // Carrega todos os dados necessários
+    await Promise.all([
+        loadDepartamentosRelacionamento(),
+        loadUsuarios(),
+        loadMaquina(),
+        loadSoftware(),
+        loadPIP()
+    ]);
+
+    // Configura o evento de submit do formulário
     document.getElementById('relacionamento-form').addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        const usuarioNome = document.getElementById('nomeUsuarioo').value;
-        const departamentoNome = document.getElementById('relacionamento-departamento').value;
-        const maquinaNome = document.getElementById('nomeMaquina').value;
-        const nomePib = document.getElementById('nomePip').value;
-        const nomeSoftware = document.getElementById('nomeSoftware').value;
+        // Obtém os valores do formulário
+        const idUsuario = document.getElementById('nomeUsuarioo').value;
+        const idDepartamento = document.getElementById('relacionamento-departamento').value;
+        const idMaquina = document.getElementById('nomeMaquina').value;
+        const idSoftware = document.getElementById('nomeSoftware').value;
+        const idSuprimento = document.getElementById('nomePip').value;
 
-        console.log(usuarioNome)
-        console.log(departamentoNome)
-        console.log(maquinaNome)
-        console.log(nomePib)
-        console.log(nomeSoftware)
-
-
-
-    if (!departamentoNome) {
-        showToast('Por favor, selecione um departamento', 'error');
-        return;
-    }
-
-    if (!maquinaNome) {
-        showToast('Por favor, selecione uma máquina', 'error');
-        return;
-    }
-
-    if (!nomePib) {
-        showToast('Por favor, selecione um suprimento (PIB)', 'error');
-        return;
-    }
-
-    if (!nomeSoftware) {
-        showToast('Por favor, selecione um software', 'error');
-        return;
-    }
-
-        try {
-        const response = await fetch('http://localhost:8080/relacionamento', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                idDepartamento: departamentoNome,
-                idUsuario: usuarioNome,
-                idMaquina: maquinaNome,
-                idSoftware : nomeSoftware,
-                idSuprimento : nomePib
-            })
-        });
-
-            if (response.ok) {
-                console.log('a response é: ' + response)
-                const data = await response.json();
-                showToast('Relacionamento salvo com sucesso!', 'success');
-                document.getElementById('relacionamento-form').reset();
-            } else {
-                const errorData = await response.json();
-                showToast(`Erro ao cadastrar: ${errorData.message || 'Erro desconhecido'}`, 'error');
-            }
-        } catch (error) {
-            console.error('Erro:', error);
-            showToast('Erro na conexão com o servidor', 'error');
+        // Validação básica
+        if (!idUsuario || !idDepartamento || !idMaquina || !idSoftware || !idSuprimento) {
+            showToast('Preencha todos os campos obrigatórios', 'error');
+            return;
         }
 
+        try {
+            // Envia os dados para a API
+            const response = await authFetch('/relacionamento', {
+                method: 'POST',
+                body: JSON.stringify({
+                    idUsuario,
+                    idDepartamento,
+                    idMaquina,
+                    idSoftware,
+                    idSuprimento
+                })
+            });
+
+            if (response) {
+                showToast('Relacionamento cadastrado com sucesso!', 'success');
+                this.reset();
+                // Atualiza a lista de inventário se estiver na página
+                if (typeof fetchData === 'function') {
+                    fetchData();
+                }
+            }
+        } catch (error) {
+            console.error('Erro ao cadastrar relacionamento:', error);
+            showToast('Erro ao cadastrar relacionamento', 'error');
+        }
+    });
+
+    // Evento para carregar detalhes da máquina selecionada
+    document.getElementById('nomeMaquina').addEventListener('change', async function() {
+        const maquinaId = this.value;
+        if (maquinaId) {
+            const maquina = await fetchMaquina(maquinaId);
+            if (maquina) {
+                document.getElementById('marcaProcessador').value = maquina.marcaProcessador;
+                document.getElementById('processador').value = maquina.processador;
+                document.getElementById('modeloMemoria').value = maquina.modeloMemoria;
+                document.getElementById('frequenciaMemoria').value = maquina.frequenciaMemoria;
+                document.getElementById('quantidadeMemoria').value = maquina.quantidadeMemoria;
+                document.getElementById('tipoArmazenamento').value = maquina.tipoArmazenamento;
+                document.getElementById('quantidadeArmazenamento').value = maquina.quantidadeArmazenamento;
+            }
+        }
     });
 });
 
+// Funções para carregar os selects
+async function loadDepartamentosRelacionamento() {
+    try {
+        const response = await authFetch('/departamento');
+        if (response) {
+            const departamentos = await response.json();
+            const select = document.getElementById('relacionamento-departamento');
+            select.innerHTML = '<option value="">Selecione...</option>';
+            
+            departamentos.forEach(depto => {
+                const option = document.createElement('option');
+                option.value = depto.idDepartamento;
+                option.textContent = depto.nomeDepartamento;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Erro ao carregar departamentos:', error);
+        showToast('Erro ao carregar departamentos', 'error');
+    }
+}
 
 async function loadUsuarios() {
     try {
-        const response = await fetch('http://localhost:8080/usuario');
-        if (response.ok) {
+        const response = await authFetch('/usuario');
+        if (response) {
             const usuarios = await response.json();
-            console.log('API Response:', usuarios); // Debug API response
             const select = document.getElementById('nomeUsuarioo');
+            select.innerHTML = '<option value="">Selecione...</option>';
+            
             usuarios.forEach(usuario => {
                 const option = document.createElement('option');
-                option.value = usuario.idUsusario;
+                option.value = usuario.idUsuario;
                 option.textContent = usuario.nomeUsuario;
-                select.append(option);  
+                select.appendChild(option);
             });
-        } else {
-            console.error('Erro ao carregar usuarios');
         }
     } catch (error) {
-        console.error('Erro:', error);
+        console.error('Erro ao carregar usuários:', error);
+        showToast('Erro ao carregar usuários', 'error');
     }
 }
-
-async function loadDepartamentosRelacionamento() {
-    try {
-        const response = await fetch('http://localhost:8080/departamento');
-        if (response.ok) {
-            const departamentos = await response.json();
-            console.log('API Response:', departamentos); // Debug API response
-            const select = document.getElementById('relacionamento-departamento');
-            departamentos.forEach(departamento => {
-                const option = document.createElement('option');
-                option.value = departamento.idDepartamento;
-                option.textContent = departamento.nomeDepartamento;
-                select.append(option);  
-            });
-        } else {
-            console.error('Erro ao carregar departamentos');
-        }
-    } catch (error) {
-        console.error('Erro:', error);
-    }
-}
-
 
 async function loadMaquina() {
     try {
-        const response = await fetch('http://localhost:8080/maquina');
-        if (response.ok) {
+        const response = await authFetch('/maquina');
+        if (response) {
             const maquinas = await response.json();
-            console.log('API Response:', maquinas); // Debug API response
             const select = document.getElementById('nomeMaquina');
+            select.innerHTML = '<option value="">Selecione...</option>';
+            
             maquinas.forEach(maquina => {
                 const option = document.createElement('option');
                 option.value = maquina.idMaquina;
                 option.textContent = maquina.placaMae;
-                select.append(option);  
+                select.appendChild(option);
             });
-        } else {
-            console.error('Erro ao carregar departamentos');
         }
     } catch (error) {
-        console.error('Erro:', error);
+        console.error('Erro ao carregar máquinas:', error);
+        showToast('Erro ao carregar máquinas', 'error');
     }
 }
 
 async function loadPIP() {
     try {
-        const response = await fetch('http://localhost:8080/pip');
-        if (response.ok) {
+        const response = await authFetch('/pip');
+        if (response) {
             const pips = await response.json();
-            console.log('API Response:', pips); // Debug API response
             const select = document.getElementById('nomePip');
+            select.innerHTML = '<option value="">Selecione...</option>';
+            
             pips.forEach(pip => {
                 const option = document.createElement('option');
                 option.value = pip.idPip;
                 option.textContent = pip.nomePip;
-                select.append(option);  
+                select.appendChild(option);
             });
-        } else {
-            console.error('Erro ao carregar departamentos');
         }
     } catch (error) {
-        console.error('Erro:', error);
+        console.error('Erro ao carregar PIPs:', error);
+        showToast('Erro ao carregar PIPs', 'error');
     }
 }
 
 async function loadSoftware() {
     try {
-        const response = await fetch('http://localhost:8080/software');
-        if (response.ok) {
+        const response = await authFetch('/software');
+        if (response) {
             const softwares = await response.json();
-            console.log('API Response:', softwares); // Debug API response
             const select = document.getElementById('nomeSoftware');
+            select.innerHTML = '<option value="">Selecione...</option>';
+            
             softwares.forEach(software => {
                 const option = document.createElement('option');
                 option.value = software.idSoftware;
                 option.textContent = software.nomeSoftware;
-                select.append(option);  
+                select.appendChild(option);
             });
-        } else {
-            console.error('Erro ao carregar departamentos');
         }
     } catch (error) {
-        console.error('Erro:', error);
+        console.error('Erro ao carregar softwares:', error);
+        showToast('Erro ao carregar softwares', 'error');
     }
 }
 
-
-document.getElementById('nomeMaquina').addEventListener('change', async function() {
-    const maquinaId = this.value;
-    if (maquinaId) {
-        const maquina = await fetchMaquina(maquinaId);
-        if (maquina) {
-            document.getElementById('marcaProcessador').value = maquina.marcaProcessador;
-            document.getElementById('processador').value = maquina.processador;
-            document.getElementById('modeloMemoria').value = maquina.modeloMemoria;
-            document.getElementById('frequenciaMemoria').value = maquina.frequenciaMemoria;
-            document.getElementById('quantidadeMemoria').value = maquina.quantidadeMemoria;
-            document.getElementById('tipoArmazenamento').value = maquina.tipoArmazenamento;
-            document.getElementById('quantidadeArmazenamento').value = maquina.quantidadeArmazenamento;
-
-            document.getElementById('subform-maquina').style.display = 'block';
-        }
-    } else {
-        document.getElementById('subform-maquina').style.display = 'none';
-    }
-});
-
+// Função auxiliar para buscar detalhes da máquina
 async function fetchMaquina(maquinaId) {
     try {
-        const response = await fetch(`http://localhost:8080/maquina/${maquinaId}`);
-        if (response.ok) {
+        const response = await authFetch(`/maquina/${maquinaId}`);
+        if (response) {
             return await response.json();
-        } else {
-            console.error('Erro ao carregar a máquina');
-            return null;
         }
+        return null;
     } catch (error) {
-        console.error('Erro:', error);
+        console.error('Erro ao buscar máquina:', error);
         return null;
     }
 }
