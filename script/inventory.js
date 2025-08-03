@@ -1,3 +1,15 @@
+function parseJwt(token) {
+    if (!token) return null;
+    try {
+        const payload = token.split('.')[1]; // pega o payload do JWT
+        return JSON.parse(atob(payload));    // decodifica de Base64 para objeto
+    } catch (e) {
+        console.error('JWT inválido', e);
+        return null;
+    }
+}
+
+
 async function fetchData() {
     try {
         const response = await fetch('http://localhost:8080/relacionamento');
@@ -11,6 +23,13 @@ async function fetchData() {
 function populateTable(data) {
     const tbody = document.getElementById('inventory-body');
     tbody.innerHTML = '';
+
+    // 🔐 Recupera a role a partir do token
+    const token = localStorage.getItem('token');
+    const payload = parseJwt(token);
+    const role = Number(payload?.role); // transforma em número por segurança
+
+    console.log("Role atual:", role);
 
     data.forEach(item => {
         const row = document.createElement('tr');
@@ -40,7 +59,9 @@ function populateTable(data) {
         pip.textContent = item.pip.nomePip;
         row.appendChild(pip);
 
-        const acoes = document.createElement('td');
+        const acoes = document.createElement('td');  
+    if (role === 0) {
+
         const deleteButton = document.createElement('button');
         deleteButton.innerHTML = `<i class="fas fa-trash-alt"></i> Apagar`;
         deleteButton.onclick = () => deleteItem(item.idUsuMaqSoftPip);
@@ -55,8 +76,9 @@ function populateTable(data) {
         deleteButton.style.display = 'inline-flex';
         deleteButton.style.alignItems = 'center';
         deleteButton.style.gap = '6px';
-                       
+                
         acoes.appendChild(deleteButton);
+    }
         row.appendChild(acoes);
         row.onclick = () => mostrarDetalhes(item);
         tbody.appendChild(row);

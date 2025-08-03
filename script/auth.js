@@ -60,20 +60,18 @@ document.getElementById('form-login').addEventListener('submit', async (event) =
 
       const { token } = await response.json();
       localStorage.setItem('token', token);         // grava token
-      const payload = parseJwt(token);              // extrai dados do JWT
-      const role = payload?.role || 'user';         // ajuste se o claim tiver outro nome
+      const payload = parseJwt(token);   
+      console.log("Esse é o payload" + payload?.role)           // extrai dados do JWT
+      const role = payload?.role || 'user';    
 
       // guarda o papel para usar depois
       localStorage.setItem('role', role);
 
-    // oculta/mostra seções de acordo com o papel
-      if (role !== 'user') {
-          document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-      } else {
-          document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
-      }
+      console.log("A role é essa: " + role)
+
       // Redireciona para a tela da aplicação
       localStorage.setItem('lastLoginEmail', payload.sub || email);
+    
       window.location.href = 'index.html?login=success'; // Adiciona parâmetro na URL
       // Exibe mensagem de boas-vindas
       showToast(`Bem‑vindo, ${payload.sub || email}!`, 'success');
