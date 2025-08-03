@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function loadUsuarios() {
     try {
-        const response = await fetch('http://localhost:8080/usuario');
+        const response = await fetch('http://localhost:8080/usuarioSistema');
         if (response.ok) {
             const usuarios = await response.json();
             console.log('API Response:', usuarios); // Debug API response
