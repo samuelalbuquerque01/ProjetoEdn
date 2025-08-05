@@ -60,10 +60,10 @@ Sistema completo para gerenciamento de inventário de TI, com cadastro de equipa
 ![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?logo=chart.js&logoColor=white)
 ![Font Awesome](https://img.shields.io/badge/Font_Awesome-528DD7?logo=font-awesome&logoColor=white)
 
-### Backend (API)
+### Backend 
 - Endpoints RESTful
 - Autenticação JWT
-- Java
+- Java 
 
 ---
 
