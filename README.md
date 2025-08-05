@@ -63,7 +63,7 @@ Sistema completo para gerenciamento de inventário de TI, com cadastro de equipa
 ### Backend (API)
 - Endpoints RESTful
 - Autenticação JWT
-- Persistência de dados (simulada/local)
+- Java
 
 ---
 
