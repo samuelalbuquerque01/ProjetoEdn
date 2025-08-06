@@ -5,10 +5,22 @@ document.addEventListener('DOMContentLoaded', async function() {
         e.preventDefault();
 
         const usuarioName = document.getElementById('nomeUsuario').value.trim();
+        const usuarioEmail = document.getElementById('emailUsuario').value.trim();
+        const usuarioSenha = document.getElementById('senhaUsuario').value.trim();
         const departamentoId = document.getElementById('nomeDepartamento').value;
 
         if (!usuarioName) {
             showToast('Por favor, digite um nome para o usuário', 'error');
+            return;
+        }
+
+        if (!usuarioEmail) {
+            showToast('Por favor, digite um email para o usuário', 'error');
+            return;
+        }
+
+        if (!usuarioSenha) {
+            showToast('Por favor, digite uma senha para o usuário', 'error');
             return;
         }
 
@@ -18,13 +30,15 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
 
         try {
-            const response = await fetch('http://localhost:8080/usuario', {
+            const response = await fetch('http://localhost:8080/usuarioSistema', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     nome: usuarioName,
+                    email: usuarioEmail,
+                    senha: usuarioSenha,
                     idDepartamento: departamentoId
                 })
             });

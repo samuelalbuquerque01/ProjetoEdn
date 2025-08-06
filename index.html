@@ -106,10 +106,10 @@
                             <option value="">Selecione...</option>
                             <!-- Opções serão preenchidas via JavaScript -->
                         </select>
-                        <label>Departamento</label>
+                <!--    <label>Departamento</label>
                         <select name="relacionamento-departamento" id="relacionamento-departamento" required>
                             <option value="">Selecione...</option>
-                            <!-- Opções serão preenchidas via JavaScript -->
+                             Opções serão preenchidas via JavaScript -->
                         </select>
                         <label>Máquina</label>
                         <select name="maquina" id="nomeMaquina" required>
@@ -155,6 +155,14 @@
                     <div class="form-group">
                         <label>Nome</label>
                         <input type="text" id="nomeUsuario" name="nome" required>
+                    </div>
+                        <div class="form-group">
+                        <label>Email</label>
+                        <input type="text" id="emailUsuario" name="email" required>
+                    </div>
+                        <div class="form-group">
+                        <label>Senha</label>
+                        <input type="text" id="senhaUsuario" name="senha" required>
                     </div>
                     <div class="form-group">
                         <label>Departamento</label>
@@ -223,7 +231,7 @@
                         <select id="marca-processador" name="marca_processador" required>
                             <option value="">Selecione...</option>
                             <option value="AMD">AMD</option>
-                            <option value="INTEL">Intel</option>
+                            <option value="INTEL">INTEL</option>
                         </select>
                     </div>
                     
@@ -359,17 +367,19 @@
                         <div class="detalhes-card">
                             <h4><i class="fas fa-box"></i> PIP</h4>
                             <div id="detalhes-pip">
-                                <p><strong>Código:</strong> <span id="pip-codigo">PIP-2023-001</span></p>
-                                <p><strong>Data:</strong> <span id="pip-data">05/07/2023</span></p>
+                                <p><strong>Código:</strong> <span id="pip-codigo"></span></p>
+                                <p><strong>Data:</strong> <span id="pip-data"></span></p>
                             </div>
                         </div>
                         
                         <!-- Cartão de Software -->
                         <div class="detalhes-card">
                             <h4><i class="fas fa-code"></i> Software</h4>
-                            <ul id="detalhes-software">
+                            <div id="detalhes-software">
+                                <p><strong>Nome:</strong> <span id="nome-software"></span></p>
+                                <p><strong>Serial:</strong> <span id="serial-software"></span></p>
                                 <!-- Itens serão adicionados via JavaScript -->
-                            </ul>
+                            </div>
                         </div>
                     </div>
                 </div>

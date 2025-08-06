@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', async function() {
-    await loadDepartamentosRelacionamento();
     await loadUsuarios();
     await loadMaquina();
     await loadSoftware();
@@ -9,23 +8,15 @@ document.addEventListener('DOMContentLoaded', async function() {
         e.preventDefault();
 
         const usuarioNome = document.getElementById('nomeUsuarioo').value;
-        const departamentoNome = document.getElementById('relacionamento-departamento').value;
         const maquinaNome = document.getElementById('nomeMaquina').value;
         const nomePib = document.getElementById('nomePip').value;
         const nomeSoftware = document.getElementById('nomeSoftware').value;
 
-        console.log(usuarioNome)
-        console.log(departamentoNome)
+        console.log("nome" + usuarioNome)
         console.log(maquinaNome)
         console.log(nomePib)
         console.log(nomeSoftware)
 
-
-
-    if (!departamentoNome) {
-        showToast('Por favor, selecione um departamento', 'error');
-        return;
-    }
 
     if (!maquinaNome) {
         showToast('Por favor, selecione uma máquina', 'error');
@@ -49,11 +40,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                idDepartamento: departamentoNome,
                 idUsuario: usuarioNome,
                 idMaquina: maquinaNome,
                 idSoftware : nomeSoftware,
-                idSuprimento : nomePib
+                idPip : nomePib
             })
         });
 
@@ -74,17 +64,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
 });
 
-
 async function loadUsuarios() {
     try {
-        const response = await fetch('http://localhost:8080/usuario');
+        const response = await fetch('http://localhost:8080/usuarioSistema');
         if (response.ok) {
             const usuarios = await response.json();
             console.log('API Response:', usuarios); // Debug API response
             const select = document.getElementById('nomeUsuarioo');
             usuarios.forEach(usuario => {
                 const option = document.createElement('option');
-                option.value = usuario.idUsusario;
+                option.value = usuario.idUsuario;
                 option.textContent = usuario.nomeUsuario;
                 select.append(option);  
             });
@@ -187,12 +176,12 @@ document.getElementById('nomeMaquina').addEventListener('change', async function
     if (maquinaId) {
         const maquina = await fetchMaquina(maquinaId);
         if (maquina) {
-            document.getElementById('marcaProcessador').value = maquina.marcaProcessador;
+            document.getElementById('marcaProcessador').value = maquina.marcaProcessador.nomeMarcaProcessador;
             document.getElementById('processador').value = maquina.processador;
-            document.getElementById('modeloMemoria').value = maquina.modeloMemoria;
-            document.getElementById('frequenciaMemoria').value = maquina.frequenciaMemoria;
+            document.getElementById('modeloMemoria').value = maquina.modeloMemoria.modeloMemoria;
+            document.getElementById('frequenciaMemoria').value = maquina.frequenciaMemoria.frequenciaMemoria;
             document.getElementById('quantidadeMemoria').value = maquina.quantidadeMemoria;
-            document.getElementById('tipoArmazenamento').value = maquina.tipoArmazenamento;
+            document.getElementById('tipoArmazenamento').value = maquina.tipoArmazenamento.tipoArmazenamento;
             document.getElementById('quantidadeArmazenamento').value = maquina.quantidadeArmazenamento;
 
             document.getElementById('subform-maquina').style.display = 'block';
