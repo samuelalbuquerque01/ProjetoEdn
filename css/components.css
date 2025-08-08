@@ -493,3 +493,90 @@ option[value=""][disabled] {
 option {
     color: var(--dark-color);
 }
+
+/* Estilo para a pesquisa e export do inventário */
+.search-box input[type="text"] {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  margin-left: 8px;
+}
+
+.search-box input[type="text"]:focus {
+  border-color: #4361ee;
+  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+}
+
+/* Ícone da lupa */
+.search-box i {
+  color: #4361ee;
+  font-size: 16px;
+  margin-right: 6px;
+}
+
+/* Botão de exportar */
+.export-btn {
+  margin-top: 10px;
+  background-color: #4361ee;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.3s;
+}
+
+.export-btn:hover {
+  background-color: #364fc7;
+}
+
+/* Estilos para a página de chamados */
+.ticket-summary {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+
+.ticket-summary .card {
+  flex: 1;
+  padding: 1rem;
+  border-radius: 8px;
+  color: white;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.ticket-summary .card.open { background-color: #4361ee; }
+.ticket-summary .card.progress { background-color: #f0ad4e; }
+.ticket-summary .card.closed { background-color: #28a745; }
+
+.ticket-card {
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #4361ee;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ticket-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.ticket-card.status-em-andamento {
+  border-left-color: #f0ad4e;
+}
+
+.ticket-card.status-resolvido {
+  border-left-color: #28a745;
+}
