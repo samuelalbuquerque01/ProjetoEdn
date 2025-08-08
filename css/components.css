@@ -537,3 +537,46 @@ option {
 .export-btn:hover {
   background-color: #364fc7;
 }
+
+/* Estilos para a página de chamados */
+.ticket-summary {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+
+.ticket-summary .card {
+  flex: 1;
+  padding: 1rem;
+  border-radius: 8px;
+  color: white;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.ticket-summary .card.open { background-color: #4361ee; }
+.ticket-summary .card.progress { background-color: #f0ad4e; }
+.ticket-summary .card.closed { background-color: #28a745; }
+
+.ticket-card {
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #4361ee;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ticket-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.ticket-card.status-em-andamento {
+  border-left-color: #f0ad4e;
+}
+
+.ticket-card.status-resolvido {
+  border-left-color: #28a745;
+}
