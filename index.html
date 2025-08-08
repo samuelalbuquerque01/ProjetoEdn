@@ -37,6 +37,12 @@
                 <button onclick="showPage('maquina')">
                     <i class="fas fa-laptop"></i> MÁQUINA
                 </button>
+
+                <!-- Dentro da <nav class="menu"> -->
+<button onclick="showPage('chamados')">
+    <i class="fas fa-ticket-alt"></i> MEUS CHAMADOS
+</button>
+
                 <button onclick="showPage('relacionamento')">
                     <i class="fas fa-project-diagram"></i> RELACIONAMENTOS
                 </button>
@@ -93,6 +99,29 @@
                     </div>
                 </form>
             </section>
+
+            <!-- Página de Chamados -->
+<section id="chamados-page" class="page">
+    <div class="list-header">
+        <h2><i class="fas fa-ticket-alt"></i> Meus Chamados</h2>
+        <div class="list-actions">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="chamados-search" placeholder="Pesquisar chamados...">
+            </div>
+        </div>
+    </div>
+    
+    <div class="ticket-summary">
+        <div class="card open"><strong id="abertos-count">0</strong><span>🔓 Abertos</span></div>
+        <div class="card progress"><strong id="andamento-count">0</strong><span>⚙️ Em Andamento</span></div>
+        <div class="card closed"><strong id="resolvidos-count">0</strong><span>✅ Resolvidos</span></div>
+    </div>
+    
+    <div id="chamados-list" class="ticket-list"></div>
+</section>
+
+            
 
             <!-- Página de Relacionamentos -->
             <section id="relacionamento-page" class="page">
@@ -299,6 +328,8 @@
                 </form>
             </section>
 
+   
+
             <!-- Página de Inventário -->
             <section id="list-page" class="page">
                 <div class="list-header">
@@ -388,5 +419,6 @@
     <script src="script/inventory.js"></script>
     <script src="script/charts.js"></script>
     <script src="script/relacionamento.js"></script>
+    <script src="script/chamados.js"></script>
 </body>
 </html>
