@@ -1,14 +1,14 @@
 document.addEventListener('DOMContentLoaded', async function () {
   await getChamados(); // Coloque await aqui se quiser esperar a função terminar
-  await pegarChamadosEmAbertos();
-  await pegarChamadosEmTratativa();
-  await pegarChamadosResolvidos();
+  await pegarQtdChamadosEmAbertosAdmin();
+  await pegarQtdChamadosEmTratativaAdmin();
+  await pegarQtdChamadosResolvidosAdmin();
 });
 
 async function getChamados() {
   const token = localStorage.getItem('token'); // ou onde você armazenou o token
   try {
-    const response = await fetch('http://localhost:8080/chamados/usuario', {
+    const response = await fetch('http://localhost:8080/chamados/admin', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -20,7 +20,7 @@ async function getChamados() {
     }
 
     const data = await response.json();
-    console.log('Chamados recebidos:', data);
+    console.log('Chamados admin:', data);
     // aqui você pode chamar alguma função para renderizar os chamados na tela
 
   } catch (error) {
@@ -59,9 +59,6 @@ function renderDashboard(container) {
       <h2><i class="fa fa-clipboard-list"></i> Meus Chamados</h2>
       <div class="dashboard-actions">
         <input type="text" id="searchTickets" placeholder="🔍 Buscar por título ou descrição..." />
-        <button id="btnNewTicket" class="primary">
-          <i class="fa fa-plus"></i> Novo Chamado
-        </button>
       </div>
     </div>
 
@@ -85,16 +82,12 @@ function renderDashboard(container) {
 
     <div class="ticket-summary">
       <div class="card open"><strong>0</strong><span><br> Chamados Abertos</span></div>
-      <div class="card progress"><strong>10</strong><span><br> Em Andamento</span></div>
-      <div class="card closed"><strong>10</strong><span><br> Resolvidos</span></div>
+      <div class="card progress"><strong>0</strong><span><br> Em Andamento</span></div>
+      <div class="card closed"><strong>0</strong><span><br> Resolvidos</span></div>
     </div>
 
     <div id="ticketsList" class="ticket-list"></div>
   `;
-
-  document.getElementById('btnNewTicket').addEventListener('click', () => {
-    renderNewTicket(container);
-  });
 
   document.getElementById('filterStatus').addEventListener('change', updateTicketsList);
   document.getElementById('filterPriority').addEventListener('change', updateTicketsList);
@@ -104,10 +97,10 @@ function renderDashboard(container) {
 }
 
 
-async function pegarChamadosEmAbertos() {
+async function pegarQtdChamadosEmAbertosAdmin() {
   const token = localStorage.getItem('token');
   try {
-    const response = await fetch('http://localhost:8080/chamados/emAberto', {
+    const response = await fetch('http://localhost:8080/chamados/admin/emAberto', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -129,10 +122,10 @@ async function pegarChamadosEmAbertos() {
   }
 }
 
-async function pegarChamadosEmTratativa() {
+async function pegarQtdChamadosEmTratativaAdmin() {
   const token = localStorage.getItem('token');
   try {
-    const response = await fetch('http://localhost:8080/chamados/emTratativa', {
+    const response = await fetch('http://localhost:8080/chamados/admin/emTratativa', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -154,10 +147,10 @@ async function pegarChamadosEmTratativa() {
   }
 }
 
-async function pegarChamadosResolvidos() {
+async function pegarQtdChamadosResolvidosAdmin() {
   const token = localStorage.getItem('token');
   try {
-    const response = await fetch('http://localhost:8080/chamados/resolvidos', {
+    const response = await fetch('http://localhost:8080/chamados/admin/resolvidos', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -189,7 +182,7 @@ async function updateTicketsList() {
   let filtrados = [];
 
   try {
-    const response = await fetch('http://localhost:8080/chamados/usuario', {
+    const response = await fetch('http://localhost:8080/chamados/admin', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -253,4 +246,15 @@ async function updateTicketsList() {
     ticketsList.appendChild(card);
   });
 
+}
+
+function formatarData(dataISO) {
+  const data = new Date(dataISO);
+  return data.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 }
