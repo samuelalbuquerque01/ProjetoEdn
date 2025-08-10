@@ -239,13 +239,200 @@ async function updateTicketsList() {
       </div>
     `;
 
-    card.addEventListener('click', () => {
-      renderTicketDetails(document.getElementById('app'), ticket);
-    });
+card.addEventListener('click', () => {
+  const container = document.querySelector('.page.active'); // container da página ativa
+  renderTicketDetails(container, ticket);
+});
 
     ticketsList.appendChild(card);
   });
 
+}
+
+function renderTicketDetails(container, ticket) {
+  container.innerHTML = `
+    <div class="ticket-details-container">
+      <h2>Detalhes do Chamado #${ticket.idChamado}</h2>
+      
+      <div class="ticket-details">
+        <div class="detail-row">
+          <span class="detail-label">Título:</span>
+          <span class="detail-value">${ticket.tituloChamado}</span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-label">Status:</span>
+          <span class="detail-value status-${(ticket.status?.valorStatus || 'desconhecido').toLowerCase().replace(' ', '-')}">
+            ${ticket.status?.valorStatus || 'Desconhecido'}
+          </span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-label">Setor:</span>
+          <span class="detail-value">${ticket.departamento?.nomeDepartamento || 'Não informado'}</span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-label">Prioridade:</span>
+          <span class="detail-value priority-${(ticket.prioridade?.nivelPrioridade || 'sem-prioridade').toLowerCase()}">
+            ${ticket.prioridade?.nivelPrioridade || 'Sem prioridade'}
+          </span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-label">Criado em:</span>
+          <span class="detail-value">${formatarData(ticket.dataCadastro)}</span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-label">Criado por:</span>
+          <span class="detail-value">${ticket.usuarioSistema?.username || 'Desconhecido'}</span>
+        </div>
+        
+        <div class="detail-row full-width">
+          <span class="detail-label">Descrição:</span>
+          <p class="detail-value">${ticket.descricao}</p>
+        </div>
+        
+        ${ticket.anexoNome ? `
+        <div class="detail-row">
+          <span class="detail-label">Anexo:</span>
+          <span class="detail-value">
+            <a href="#" class="download-link">${ticket.anexoNome}</a>
+          </span>
+        </div>` : ''}
+      </div>
+
+      <div class="comment-box">
+        
+        <div id="comentarios">
+          ${(ticket.comentarios || []).map(c => `
+            <div class="comment">
+              <div class="comment-header">
+                <strong>${c.autor}</strong>
+                <span class="comment-date">${formatarData(c.data)}</span>
+              </div>
+              <p class="comment-text">${c.texto}</p>
+            </div>
+          `).join('')}
+            
+            <textarea id="comentarioNovo" placeholder="Escreva um comentário..."></textarea><br>
+            <button id="btnVoltar" class="secondary"> Voltar para a lista</button><br><br>
+            <button id="btnMarcarEmAndamento">Marcar como em andamento</button>
+            <button id="btnMarcarResolvido">Marcar como Resolvido</button>
+    </div>
+  `;
+
+document.getElementById('btnMarcarEmAndamento').addEventListener('click', async () => {
+  const texto = document.getElementById('comentarioNovo').value.trim();
+
+  const payload = {
+    idChamado: ticket.idChamado,
+    idStatus: 2,
+    comentario: texto
+  };
+
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await fetch(`http://localhost:8080/chamados/admin/tratar`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao atualizar chamado');
+    }
+
+    // Supondo que o backend retorne o chamado atualizado
+    const chamadoAtualizado = await response.json();
+
+    // Atualiza o ticket local com os dados retornados do backend
+    Object.assign(ticket, chamadoAtualizado);
+
+    // Limpa o textarea
+    document.getElementById('comentarioNovo').value = '';
+
+    // Re-renderiza os detalhes do chamado atualizados
+    renderTicketDetails(container, ticket);
+
+    alert('Chamado marcado como em andamento com sucesso!');
+  } catch (error) {
+    console.error(error);
+    alert('Erro ao marcar o chamado como em andamento.');
+  }
+});
+
+document.getElementById('btnMarcarResolvido').addEventListener('click', async () => {
+  const texto = document.getElementById('comentarioNovo').value.trim();
+
+  const payload = {
+    idChamado: ticket.idChamado,
+    idStatus: 3,
+    comentario: texto
+  };
+
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await fetch(`http://localhost:8080/chamados/admin/tratar`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao atualizar chamado');
+    }
+
+    // Supondo que o backend retorne o chamado atualizado
+    const chamadoAtualizado = await response.json();
+
+    // Atualiza o ticket local com os dados retornados do backend
+    Object.assign(ticket, chamadoAtualizado);
+
+    // Limpa o textarea
+    document.getElementById('comentarioNovo').value = '';
+
+    // Re-renderiza os detalhes do chamado atualizados
+    renderTicketDetails(container, ticket);
+
+    alert('Chamado marcado como em andamento com sucesso!');
+  } catch (error) {
+    console.error(error);
+    alert('Erro ao marcar o chamado como em andamento.');
+  }
+});
+
+  document.getElementById('btnMarcarResolvido')?.addEventListener('click', () => {
+    if (confirm('Deseja realmente marcar este chamado como resolvido?')) {
+      ticket.status.valorStatus = 'Resolvido';
+      ticket.comentarios.push({
+        autor: getUsuarioAtual(),
+        texto: 'Chamado marcado como resolvido',
+        data: new Date().toISOString(),
+      });
+      
+      if (salvarChamado(ticket)) {
+        renderDashboard(container);
+      }
+    }
+  });
+
+document.getElementById('btnVoltar').addEventListener('click', async () => {
+  renderDashboard(container);
+  await pegarQtdChamadosEmAbertosAdmin();
+  await pegarQtdChamadosEmTratativaAdmin();
+  await pegarQtdChamadosResolvidosAdmin();
+  await updateTicketsList();
+});
 }
 
 function formatarData(dataISO) {
