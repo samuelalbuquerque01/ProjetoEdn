@@ -294,15 +294,19 @@ function renderTicketDetails(container, ticket) {
           <p class="detail-value">${ticket.descricao}</p>
         </div>
         
-        ${ticket.anexoNome ? `
-        <div class="detail-row">
+        ${ticket.anexo ? `
+        <div class="detail-row full-width">
           <span class="detail-label">Anexo:</span>
-          <span class="detail-value">
-            <a href="#" class="download-link">${ticket.anexoNome}</a>
-          </span>
+          <div class="detail-value">
+            <img 
+              src="data:image/png;base64,${ticket.anexo}" 
+              alt="Anexo do Chamado"
+              style="max-width: 300px; border-radius: 5px; border: 1px solid #ccc;" 
+            />
+          </div>
         </div>` : ''}
       </div>
-
+      
       <div class="comment-box">
         
         <div id="comentarios">
