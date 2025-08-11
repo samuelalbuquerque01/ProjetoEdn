@@ -1,7 +1,17 @@
-function showPage(pageId) {
+async function showPage(pageId) {
   document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-  document.getElementById(`${pageId}-page`).classList.add('active');
-  if (pageId === 'home') initCharts();
+  const selectedPage = document.getElementById(`${pageId}-page`);
+  selectedPage.classList.add('active');
+
+  if (pageId === 'home') {
+    initCharts();
+  } else if (pageId === 'chamados') {
+    renderDashboard(selectedPage);
+    await pegarQtdChamadosEmAbertosAdmin();
+    await pegarQtdChamadosEmTratativaAdmin();
+    await pegarQtdChamadosResolvidosAdmin();
+    await updateTicketsList();
+  }
 }
 
 function toggleTheme() {

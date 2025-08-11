@@ -1,14 +1,14 @@
 document.addEventListener('DOMContentLoaded', async function () {
   await getChamados(); // Coloque await aqui se quiser esperar a função terminar
-  await pegarChamadosEmAbertos();
-  await pegarChamadosEmTratativa();
-  await pegarChamadosResolvidos();
+  await pegarQtdChamadosEmAbertosAdmin();
+  await pegarQtdChamadosEmTratativaAdmin();
+  await pegarQtdChamadosResolvidosAdmin();
 });
 
 async function getChamados() {
   const token = localStorage.getItem('token'); // ou onde você armazenou o token
   try {
-    const response = await fetch('http://localhost:8080/chamados/usuario', {
+    const response = await fetch('http://localhost:8080/chamados/admin', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -20,7 +20,7 @@ async function getChamados() {
     }
 
     const data = await response.json();
-    console.log('Chamados recebidos:', data);
+    console.log('Chamados admin:', data);
     // aqui você pode chamar alguma função para renderizar os chamados na tela
 
   } catch (error) {
@@ -59,9 +59,6 @@ function renderDashboard(container) {
       <h2><i class="fa fa-clipboard-list"></i> Meus Chamados</h2>
       <div class="dashboard-actions">
         <input type="text" id="searchTickets" placeholder="🔍 Buscar por título ou descrição..." />
-        <button id="btnNewTicket" class="primary">
-          <i class="fa fa-plus"></i> Novo Chamado
-        </button>
       </div>
     </div>
 
@@ -85,16 +82,12 @@ function renderDashboard(container) {
 
     <div class="ticket-summary">
       <div class="card open"><strong>0</strong><span><br> Chamados Abertos</span></div>
-      <div class="card progress"><strong>10</strong><span><br> Em Andamento</span></div>
-      <div class="card closed"><strong>10</strong><span><br> Resolvidos</span></div>
+      <div class="card progress"><strong>0</strong><span><br> Em Andamento</span></div>
+      <div class="card closed"><strong>0</strong><span><br> Resolvidos</span></div>
     </div>
 
     <div id="ticketsList" class="ticket-list"></div>
   `;
-
-  document.getElementById('btnNewTicket').addEventListener('click', () => {
-    renderNewTicket(container);
-  });
 
   document.getElementById('filterStatus').addEventListener('change', updateTicketsList);
   document.getElementById('filterPriority').addEventListener('change', updateTicketsList);
@@ -104,10 +97,10 @@ function renderDashboard(container) {
 }
 
 
-async function pegarChamadosEmAbertos() {
+async function pegarQtdChamadosEmAbertosAdmin() {
   const token = localStorage.getItem('token');
   try {
-    const response = await fetch('http://localhost:8080/chamados/emAberto', {
+    const response = await fetch('http://localhost:8080/chamados/admin/emAberto', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -129,10 +122,10 @@ async function pegarChamadosEmAbertos() {
   }
 }
 
-async function pegarChamadosEmTratativa() {
+async function pegarQtdChamadosEmTratativaAdmin() {
   const token = localStorage.getItem('token');
   try {
-    const response = await fetch('http://localhost:8080/chamados/emTratativa', {
+    const response = await fetch('http://localhost:8080/chamados/admin/emTratativa', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -154,10 +147,10 @@ async function pegarChamadosEmTratativa() {
   }
 }
 
-async function pegarChamadosResolvidos() {
+async function pegarQtdChamadosResolvidosAdmin() {
   const token = localStorage.getItem('token');
   try {
-    const response = await fetch('http://localhost:8080/chamados/resolvidos', {
+    const response = await fetch('http://localhost:8080/chamados/admin/resolvidos', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -189,7 +182,7 @@ async function updateTicketsList() {
   let filtrados = [];
 
   try {
-    const response = await fetch('http://localhost:8080/chamados/usuario', {
+    const response = await fetch('http://localhost:8080/chamados/admin', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -246,11 +239,213 @@ async function updateTicketsList() {
       </div>
     `;
 
-    card.addEventListener('click', () => {
-      renderTicketDetails(document.getElementById('app'), ticket);
-    });
+card.addEventListener('click', () => {
+  const container = document.querySelector('.page.active'); // container da página ativa
+  renderTicketDetails(container, ticket);
+});
 
     ticketsList.appendChild(card);
   });
 
+}
+
+function renderTicketDetails(container, ticket) {
+  container.innerHTML = `
+    <div class="ticket-details-container">
+      <h2>Detalhes do Chamado #${ticket.idChamado}</h2>
+      
+      <div class="ticket-details">
+        <div class="detail-row">
+          <span class="detail-label">Título:</span>
+          <span class="detail-value">${ticket.tituloChamado}</span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-label">Status:</span>
+          <span class="detail-value status-${(ticket.status?.valorStatus || 'desconhecido').toLowerCase().replace(' ', '-')}">
+            ${ticket.status?.valorStatus || 'Desconhecido'}
+          </span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-label">Setor:</span>
+          <span class="detail-value">${ticket.departamento?.nomeDepartamento || 'Não informado'}</span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-label">Prioridade:</span>
+          <span class="detail-value priority-${(ticket.prioridade?.nivelPrioridade || 'sem-prioridade').toLowerCase()}">
+            ${ticket.prioridade?.nivelPrioridade || 'Sem prioridade'}
+          </span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-label">Criado em:</span>
+          <span class="detail-value">${formatarData(ticket.dataCadastro)}</span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-label">Criado por:</span>
+          <span class="detail-value">${ticket.usuarioSistema?.username || 'Desconhecido'}</span>
+        </div>
+        
+        <div class="detail-row full-width">
+          <span class="detail-label">Descrição:</span>
+          <p class="detail-value">${ticket.descricao}</p>
+        </div>
+        
+        ${ticket.anexo ? `
+        <div class="detail-row full-width">
+          <span class="detail-label">Anexo:</span>
+          <div class="detail-value">
+            <img 
+              src="data:image/png;base64,${ticket.anexo}" 
+              alt="Anexo do Chamado"
+              style="max-width: 300px; border-radius: 5px; border: 1px solid #ccc;" 
+            />
+          </div>
+        </div>` : ''}
+      </div>
+      
+      <div class="comment-box">
+        
+        <div id="comentarios">
+          ${(ticket.comentarios || []).map(c => `
+            <div class="comment">
+              <div class="comment-header">
+                <strong>${c.autor}</strong>
+                <span class="comment-date">${formatarData(c.data)}</span>
+              </div>
+              <p class="comment-text">${c.texto}</p>
+            </div>
+          `).join('')}
+            
+            <textarea id="comentarioNovo" placeholder="Escreva um comentário..."></textarea><br>
+            <button id="btnVoltar" class="secondary"> Voltar para a lista</button><br><br>
+            <button id="btnMarcarEmAndamento">Marcar como em andamento</button>
+            <button id="btnMarcarResolvido">Marcar como Resolvido</button>
+    </div>
+  `;
+
+document.getElementById('btnMarcarEmAndamento').addEventListener('click', async () => {
+  const texto = document.getElementById('comentarioNovo').value.trim();
+
+  const payload = {
+    idChamado: ticket.idChamado,
+    idStatus: 2,
+    comentario: texto
+  };
+
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await fetch(`http://localhost:8080/chamados/admin/tratar`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao atualizar chamado');
+    }
+
+    // Supondo que o backend retorne o chamado atualizado
+    const chamadoAtualizado = await response.json();
+
+    // Atualiza o ticket local com os dados retornados do backend
+    Object.assign(ticket, chamadoAtualizado);
+
+    // Limpa o textarea
+    document.getElementById('comentarioNovo').value = '';
+
+    // Re-renderiza os detalhes do chamado atualizados
+    renderTicketDetails(container, ticket);
+
+    alert('Chamado marcado como em andamento com sucesso!');
+  } catch (error) {
+    console.error(error);
+    alert('Erro ao marcar o chamado como em andamento.');
+  }
+});
+
+document.getElementById('btnMarcarResolvido').addEventListener('click', async () => {
+  const texto = document.getElementById('comentarioNovo').value.trim();
+
+  const payload = {
+    idChamado: ticket.idChamado,
+    idStatus: 3,
+    comentario: texto
+  };
+
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await fetch(`http://localhost:8080/chamados/admin/tratar`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao atualizar chamado');
+    }
+
+    // Supondo que o backend retorne o chamado atualizado
+    const chamadoAtualizado = await response.json();
+
+    // Atualiza o ticket local com os dados retornados do backend
+    Object.assign(ticket, chamadoAtualizado);
+
+    // Limpa o textarea
+    document.getElementById('comentarioNovo').value = '';
+
+    // Re-renderiza os detalhes do chamado atualizados
+    renderTicketDetails(container, ticket);
+
+    alert('Chamado marcado como em andamento com sucesso!');
+  } catch (error) {
+    console.error(error);
+    alert('Erro ao marcar o chamado como em andamento.');
+  }
+});
+
+  document.getElementById('btnMarcarResolvido')?.addEventListener('click', () => {
+    if (confirm('Deseja realmente marcar este chamado como resolvido?')) {
+      ticket.status.valorStatus = 'Resolvido';
+      ticket.comentarios.push({
+        autor: getUsuarioAtual(),
+        texto: 'Chamado marcado como resolvido',
+        data: new Date().toISOString(),
+      });
+      
+      if (salvarChamado(ticket)) {
+        renderDashboard(container);
+      }
+    }
+  });
+
+document.getElementById('btnVoltar').addEventListener('click', async () => {
+  renderDashboard(container);
+  await pegarQtdChamadosEmAbertosAdmin();
+  await pegarQtdChamadosEmTratativaAdmin();
+  await pegarQtdChamadosResolvidosAdmin();
+  await updateTicketsList();
+});
+}
+
+function formatarData(dataISO) {
+  const data = new Date(dataISO);
+  return data.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 }
